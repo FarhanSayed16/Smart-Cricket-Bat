@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:math';
 import '../models/shot_model.dart';
 
-/// Hardware simulator for development and testing
-/// Simulates the ESP32 + BNO055 sensor data for cricket bat
+/// ESP32 + BNO055 sensor simulator for cricket bat
+/// Simulates realistic sensor data from accelerometer, gyroscope, and magnetometer
 class HardwareSimulator {
   Timer? _timer;
   final StreamController<ShotModel> _shotController =
@@ -11,6 +11,18 @@ class HardwareSimulator {
   final Random _random = Random();
   String? _currentSessionId;
   int _shotCounter = 0;
+
+  // ESP32 sensor simulation parameters
+  double _lastAccelerationX = 0.0;
+  double _lastAccelerationY = 0.0;
+  double _lastAccelerationZ = 0.0;
+  double _lastGyroX = 0.0;
+  double _lastGyroY = 0.0;
+  double _lastGyroZ = 0.0;
+
+  // Shot detection thresholds (realistic values)
+  static const double _accelerationThreshold = 15.0; // m/s²
+  static const double _gyroThreshold = 200.0; // degrees/s
 
   /// Get stream of shot data
   Stream<ShotModel> getShotStream() {
@@ -22,10 +34,10 @@ class HardwareSimulator {
     _currentSessionId = sessionId;
     _shotCounter = 0;
 
-    // Emit a shot every 2-3 seconds
+    // Simulate ESP32 sensor readings every 50ms (20Hz sampling rate)
     _timer = Timer.periodic(
-      Duration(seconds: 2 + _random.nextInt(2)), // 2-3 seconds
-      (_) => _emitShot(),
+      const Duration(milliseconds: 50),
+      (_) => _simulateSensorReading(),
     );
   }
 
@@ -37,77 +49,126 @@ class HardwareSimulator {
     _shotCounter = 0;
   }
 
-  /// Emit a simulated shot
-  void _emitShot() {
+  /// Simulate ESP32 sensor readings and detect shots
+  void _simulateSensorReading() {
     if (_currentSessionId == null) return;
 
+    // Simulate realistic sensor noise and movement
+    _lastAccelerationX += (_random.nextDouble() - 0.5) * 2.0;
+    _lastAccelerationY += (_random.nextDouble() - 0.5) * 2.0;
+    _lastAccelerationZ += (_random.nextDouble() - 0.5) * 2.0;
+
+    _lastGyroX += (_random.nextDouble() - 0.5) * 10.0;
+    _lastGyroY += (_random.nextDouble() - 0.5) * 10.0;
+    _lastGyroZ += (_random.nextDouble() - 0.5) * 10.0;
+
+    // Apply gravity to Z-axis (bat is typically held vertically)
+    _lastAccelerationZ += 9.81;
+
+    // Detect shot based on acceleration and gyroscope thresholds
+    final accelerationMagnitude = sqrt(
+      pow(_lastAccelerationX, 2) +
+          pow(_lastAccelerationY, 2) +
+          pow(_lastAccelerationZ, 2),
+    );
+
+    final gyroMagnitude = sqrt(
+      pow(_lastGyroX, 2) + pow(_lastGyroY, 2) + pow(_lastGyroZ, 2),
+    );
+
+    // Shot detected if acceleration or gyro exceeds thresholds
+    if (accelerationMagnitude > _accelerationThreshold ||
+        gyroMagnitude > _gyroThreshold) {
+      _detectShot(accelerationMagnitude, gyroMagnitude);
+    }
+  }
+
+  /// Detect and process a cricket shot
+  void _detectShot(double accelerationMagnitude, double gyroMagnitude) {
     _shotCounter++;
     final shotId = '${_currentSessionId}_shot_$_shotCounter';
+
+    // Calculate realistic shot parameters based on sensor data
+    final batSpeed = _calculateBatSpeed(accelerationMagnitude, gyroMagnitude);
+    final powerIndex = _calculatePowerIndex(accelerationMagnitude);
+    final timingScore = _calculateTimingScore();
+    final sweetSpotAccuracy = _calculateSweetSpotAccuracy(
+      accelerationMagnitude,
+    );
 
     final shot = ShotModel(
       shotId: shotId,
       sessionId: _currentSessionId!,
       timestamp: DateTime.now(),
-      batSpeed: _generateBatSpeed(),
-      powerIndex: _generatePowerIndex(),
-      timingScore: _generateTimingScore(),
-      sweetSpotAccuracy: _generateSweetSpotAccuracy(),
+      batSpeed: batSpeed,
+      powerIndex: powerIndex,
+      timingScore: timingScore,
+      sweetSpotAccuracy: sweetSpotAccuracy,
     );
 
     _shotController.add(shot);
+
+    // Reset sensor values after shot detection
+    _resetSensorValues();
   }
 
-  /// Generate realistic bat speed (70-130 km/h)
-  double _generateBatSpeed() {
-    // Most shots are between 80-120 km/h with some outliers
-    final baseSpeed = 80.0 + _random.nextDouble() * 40.0; // 80-120
-    final variation = (_random.nextDouble() - 0.5) * 20.0; // ±10 variation
-    return (baseSpeed + variation).clamp(70.0, 130.0);
+  /// Calculate bat speed based on sensor data (km/h)
+  double _calculateBatSpeed(double acceleration, double gyro) {
+    // Realistic bat speed calculation based on acceleration and angular velocity
+    // Professional cricket bats typically reach 120-140 km/h
+    final baseSpeed = 80.0 + (acceleration * 2.0) + (gyro * 0.1);
+    return baseSpeed.clamp(60.0, 150.0);
   }
 
-  /// Generate power index (60-95)
-  int _generatePowerIndex() {
-    // Power distribution: mostly 70-90, some excellent shots
-    if (_random.nextDouble() < 0.1) {
-      // 10% chance of excellent shot (90-95)
-      return 90 + _random.nextInt(6);
-    } else if (_random.nextDouble() < 0.2) {
-      // 20% chance of good shot (80-89)
-      return 80 + _random.nextInt(10);
-    } else {
-      // 70% chance of average shot (60-79)
-      return 60 + _random.nextInt(20);
-    }
+  /// Calculate power index (0-100) based on acceleration
+  int _calculatePowerIndex(double acceleration) {
+    // Power correlates with acceleration magnitude
+    final power = (acceleration * 3.0).clamp(0.0, 100.0);
+    return power.round();
   }
 
-  /// Generate timing score (-25 to +25 ms)
-  double _generateTimingScore() {
-    // Most shots are close to perfect timing
-    if (_random.nextDouble() < 0.3) {
-      // 30% chance of perfect timing
-      return 0.0;
-    } else if (_random.nextDouble() < 0.6) {
-      // 30% chance of slightly early/late (±5ms)
-      return (_random.nextDouble() - 0.5) * 10.0;
-    } else {
-      // 40% chance of more noticeable timing issues (±25ms)
-      return (_random.nextDouble() - 0.5) * 50.0;
-    }
+  /// Calculate timing score (-50 to +50 ms)
+  double _calculateTimingScore() {
+    // Timing depends on swing consistency
+    final timingVariation = (_random.nextDouble() - 0.5) * 30.0;
+    return timingVariation.clamp(-50.0, 50.0);
   }
 
-  /// Generate sweet spot accuracy (0.7-1.0)
-  double _generateSweetSpotAccuracy() {
-    // Most shots hit the sweet spot well
-    if (_random.nextDouble() < 0.2) {
-      // 20% chance of perfect sweet spot
-      return 1.0;
-    } else if (_random.nextDouble() < 0.5) {
-      // 30% chance of very good sweet spot (0.9-1.0)
-      return 0.9 + _random.nextDouble() * 0.1;
-    } else {
-      // 50% chance of good sweet spot (0.7-0.9)
-      return 0.7 + _random.nextDouble() * 0.2;
-    }
+  /// Calculate sweet spot accuracy (0.0-1.0)
+  double _calculateSweetSpotAccuracy(double acceleration) {
+    // Sweet spot accuracy depends on acceleration consistency
+    final baseAccuracy = 0.7 + (acceleration / 50.0);
+    return baseAccuracy.clamp(0.0, 1.0);
+  }
+
+  /// Reset sensor values after shot detection
+  void _resetSensorValues() {
+    _lastAccelerationX = 0.0;
+    _lastAccelerationY = 0.0;
+    _lastAccelerationZ = 0.0;
+    _lastGyroX = 0.0;
+    _lastGyroY = 0.0;
+    _lastGyroZ = 0.0;
+  }
+
+  /// Get current sensor readings for debugging
+  Map<String, double> getCurrentSensorReadings() {
+    return {
+      'accelerationX': _lastAccelerationX,
+      'accelerationY': _lastAccelerationY,
+      'accelerationZ': _lastAccelerationZ,
+      'gyroX': _lastGyroX,
+      'gyroY': _lastGyroY,
+      'gyroZ': _lastGyroZ,
+    };
+  }
+
+  /// Simulate a manual shot trigger (for testing)
+  void triggerManualShot() {
+    if (_currentSessionId == null) return;
+
+    // Simulate a strong shot
+    _detectShot(25.0, 300.0);
   }
 
   /// Simulate a specific type of shot (for testing)
@@ -123,10 +184,10 @@ class HardwareSimulator {
       shotId: shotId,
       sessionId: sessionId,
       timestamp: DateTime.now(),
-      batSpeed: batSpeed ?? _generateBatSpeed(),
-      powerIndex: powerIndex ?? _generatePowerIndex(),
-      timingScore: timingScore ?? _generateTimingScore(),
-      sweetSpotAccuracy: sweetSpotAccuracy ?? _generateSweetSpotAccuracy(),
+      batSpeed: batSpeed ?? _calculateBatSpeed(20.0, 250.0),
+      powerIndex: powerIndex ?? _calculatePowerIndex(20.0),
+      timingScore: timingScore ?? _calculateTimingScore(),
+      sweetSpotAccuracy: sweetSpotAccuracy ?? _calculateSweetSpotAccuracy(20.0),
     );
   }
 
