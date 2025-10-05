@@ -5,6 +5,8 @@ import '../../providers/providers.dart';
 import '../../models/session_model.dart';
 import '../session/live_session_screen.dart';
 import '../session/media_gallery_screen.dart';
+import '../analytics/analytics_screen.dart';
+import '../test/data_test_screen.dart';
 
 /// Dashboard screen showing user's session history and options
 class DashboardScreen extends ConsumerWidget {
@@ -153,6 +155,64 @@ class DashboardScreen extends ConsumerWidget {
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Analytics Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const AnalyticsScreen(),
+                          ),
+                        ),
+                        icon: const Icon(Icons.analytics, size: 24),
+                        label: const Text(
+                          'View Analytics',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purple,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Data Test Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const DataTestScreen(),
+                          ),
+                        ),
+                        icon: const Icon(Icons.bug_report, size: 24),
+                        label: const Text(
+                          'Test Data Storage',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
