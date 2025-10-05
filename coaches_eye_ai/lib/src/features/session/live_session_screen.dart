@@ -248,7 +248,10 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                           decoration: BoxDecoration(
                             color: Colors.grey[900],
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey[700]!, width: 2),
+                            border: Border.all(
+                              color: Colors.grey[700]!,
+                              width: 2,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.3),
@@ -263,12 +266,14 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                               children: [
                                 // Camera Preview
                                 SizedBox.expand(
-                                  child: _cameraService?.getCameraPreview() ??
+                                  child:
+                                      _cameraService?.getCameraPreview() ??
                                       Container(
                                         color: Colors.black,
                                         child: const Center(
                                           child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
                                               Icon(
                                                 Icons.camera_alt,
@@ -297,7 +302,7 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                                         ),
                                       ),
                                 ),
-                                
+
                                 // Recording indicator
                                 if (_isRecording)
                                   Positioned(
@@ -333,7 +338,7 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                                       ),
                                     ),
                                   ),
-                                
+
                                 // Shot detection overlay
                                 if (_latestShot != null)
                                   Positioned(
@@ -346,7 +351,8 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
@@ -534,22 +540,22 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
             context,
           ).showSnackBar(SnackBar(content: Text('Video saved: $_videoPath')));
         }
-        } else {
-          final authState = ref.read(authStateProvider);
-          final appState = ref.read(appStateProvider);
-          
-          _videoPath = await _cameraService!.startVideoRecording(
-            sessionId: appState.currentSessionId,
-            playerId: authState.value?.uid,
-          );
-          setState(() => _isRecording = true);
+      } else {
+        final authState = ref.read(authStateProvider);
+        final appState = ref.read(appStateProvider);
 
-          if (mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Recording started')));
-          }
+        _videoPath = await _cameraService!.startVideoRecording(
+          sessionId: appState.currentSessionId,
+          playerId: authState.value?.uid,
+        );
+        setState(() => _isRecording = true);
+
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Recording started')));
         }
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(
