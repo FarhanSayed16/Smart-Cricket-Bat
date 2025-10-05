@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:uuid/uuid.dart';
+import 'firestore_service.dart';
 
 /// Camera service for capturing cricket shots
 class CameraService {
@@ -12,6 +14,8 @@ class CameraService {
   bool _isRecording = false;
   String? _currentVideoPath;
   bool _isInitialized = false;
+  final FirestoreService _firestoreService = FirestoreService();
+  final Uuid _uuid = const Uuid();
 
   /// Initialize camera
   Future<bool> initialize() async {
@@ -73,7 +77,7 @@ class CameraService {
   }
 
   /// Start video recording
-  Future<String?> startVideoRecording() async {
+  Future<String?> startVideoRecording({String? sessionId, String? playerId}) async {
     if (!_isInitialized || _controller == null) {
       return null;
     }
@@ -85,6 +89,22 @@ class CameraService {
       final String filePath = path.join(appDir.path, fileName);
 
       await _controller!.startVideoRecording();
+      _isRecording = true;
+      _currentVideoPath = filePath;
+
+      // Save video metadata to Firestore
+      if (sessionId != null && playerId != null) {
+        final videoId = _uuid.v4();
+        await _firestoreService.saveVideoMetadata(
+          videoId: videoId,
+          sessionId: sessionId,
+          playerId: playerId,
+          videoPath: filePath,
+          recordedAt: DateTime.now(),
+          durationInSeconds: 0, // Will be updated when recording stops
+        );
+      }
+
       return filePath;
     } catch (e) {
       print('Video recording start error: $e');

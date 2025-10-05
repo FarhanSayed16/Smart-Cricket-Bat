@@ -111,6 +111,23 @@ class FirestoreService {
     }
   }
 
+  /// Get all sessions for current user (alias for getSessionsForPlayer)
+  Future<List<SessionModel>> getUserSessions() async {
+    try {
+      // This method will be called with the current user's ID from the calling context
+      final querySnapshot = await _firestore
+          .collection('sessions')
+          .orderBy('date', descending: true)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => SessionModel.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get user sessions: $e');
+    }
+  }
+
   /// Get all shots for a specific session
   Future<List<ShotModel>> getShotsForSession(String sessionId) async {
     try {
@@ -388,5 +405,138 @@ class FirestoreService {
               .map((doc) => SessionModel.fromJson(doc.data()))
               .toList(),
         );
+  }
+
+  // ===== VIDEO AND MEDIA STORAGE METHODS =====
+
+  /// Save video metadata to Firestore
+  Future<void> saveVideoMetadata({
+    required String videoId,
+    required String sessionId,
+    required String playerId,
+    required String videoPath,
+    required DateTime recordedAt,
+    required int durationInSeconds,
+  }) async {
+    try {
+      await _firestore.collection('videos').doc(videoId).set({
+        'videoId': videoId,
+        'sessionId': sessionId,
+        'playerId': playerId,
+        'videoPath': videoPath,
+        'recordedAt': recordedAt.millisecondsSinceEpoch,
+        'durationInSeconds': durationInSeconds,
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+      });
+    } catch (e) {
+      throw Exception('Failed to save video metadata: $e');
+    }
+  }
+
+  /// Get all videos for a specific player
+  Future<List<Map<String, dynamic>>> getVideosForPlayer(String playerId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('videos')
+          .where('playerId', isEqualTo: playerId)
+          .orderBy('recordedAt', descending: true)
+          .get();
+
+      return querySnapshot.docs.map((doc) => {
+        'id': doc.id,
+        ...doc.data(),
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to get videos for player: $e');
+    }
+  }
+
+  /// Get all videos for a specific session
+  Future<List<Map<String, dynamic>>> getVideosForSession(String sessionId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('videos')
+          .where('sessionId', isEqualTo: sessionId)
+          .orderBy('recordedAt', descending: true)
+          .get();
+
+      return querySnapshot.docs.map((doc) => {
+        'id': doc.id,
+        ...doc.data(),
+      }).toList();
+    } catch (e) {
+      throw Exception('Failed to get videos for session: $e');
+    }
+  }
+
+  /// Delete video metadata from Firestore
+  Future<void> deleteVideoMetadata(String videoId) async {
+    try {
+      await _firestore.collection('videos').doc(videoId).delete();
+    } catch (e) {
+      throw Exception('Failed to delete video metadata: $e');
+    }
+  }
+
+  /// Get user analytics data
+  Future<Map<String, dynamic>> getUserAnalytics(String playerId) async {
+    try {
+      // Get all sessions for the player
+      final sessions = await getSessionsForPlayer(playerId);
+      
+      // Get all shots for all sessions
+      final allShots = <ShotModel>[];
+      for (final session in sessions) {
+        final shots = await getShotsForSession(session.sessionId);
+        allShots.addAll(shots);
+      }
+
+      if (allShots.isEmpty) {
+        return {
+          'totalSessions': 0,
+          'totalShots': 0,
+          'averageBatSpeed': 0.0,
+          'bestShotSpeed': 0.0,
+          'totalTrainingTime': 0,
+          'improvementRate': 0.0,
+          'averagePowerIndex': 0.0,
+          'averageTimingScore': 0.0,
+          'averageSweetSpotAccuracy': 0.0,
+        };
+      }
+
+      // Calculate analytics
+      final totalSessions = sessions.length;
+      final totalShots = allShots.length;
+      final averageBatSpeed = allShots.map((s) => s.batSpeed).reduce((a, b) => a + b) / totalShots;
+      final bestShotSpeed = allShots.map((s) => s.batSpeed).reduce((a, b) => a > b ? a : b);
+      final totalTrainingTime = sessions.fold<int>(0, (sum, session) => sum + session.durationInMinutes);
+      
+      // Calculate improvement rate
+      double improvementRate = 0.0;
+      if (allShots.length >= 2) {
+        final firstHalf = allShots.take(allShots.length ~/ 2).map((s) => s.batSpeed).reduce((a, b) => a + b) / (allShots.length ~/ 2);
+        final secondHalf = allShots.skip(allShots.length ~/ 2).map((s) => s.batSpeed).reduce((a, b) => a + b) / (allShots.length - allShots.length ~/ 2);
+        improvementRate = ((secondHalf - firstHalf) / firstHalf) * 100;
+      }
+
+      final averagePowerIndex = allShots.map((s) => s.powerIndex).reduce((a, b) => a + b) / totalShots;
+      final averageTimingScore = allShots.map((s) => s.timingScore).reduce((a, b) => a + b) / totalShots;
+      final averageSweetSpotAccuracy = allShots.map((s) => s.sweetSpotAccuracy).reduce((a, b) => a + b) / totalShots;
+
+      return {
+        'totalSessions': totalSessions,
+        'totalShots': totalShots,
+        'averageBatSpeed': averageBatSpeed,
+        'bestShotSpeed': bestShotSpeed,
+        'totalTrainingTime': totalTrainingTime,
+        'improvementRate': improvementRate,
+        'averagePowerIndex': averagePowerIndex,
+        'averageTimingScore': averageTimingScore,
+        'averageSweetSpotAccuracy': averageSweetSpotAccuracy,
+      };
+    } catch (e) {
+      throw Exception('Failed to get user analytics: $e');
+    }
   }
 }

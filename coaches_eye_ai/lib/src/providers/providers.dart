@@ -174,11 +174,23 @@ class AppStateNotifier extends StateNotifier<AppState> {
   }
 
   /// Add shot to current session
-  void addShot(ShotModel shot) {
-    final currentShots = List<ShotModel>.from(state.sessionShots);
-    currentShots.add(shot);
+  Future<void> addShot(ShotModel shot) async {
+    try {
+      final currentShots = List<ShotModel>.from(state.sessionShots);
+      currentShots.add(shot);
 
-    state = state.copyWith(sessionShots: currentShots);
+      // Save shot to Firestore immediately
+      final firestoreService = ref.read(firestoreServiceProvider);
+      await firestoreService.addShotToSession(shot);
+
+      state = state.copyWith(sessionShots: currentShots);
+    } catch (e) {
+      print('Error saving shot to Firestore: $e');
+      // Still add to local state even if Firestore fails
+      final currentShots = List<ShotModel>.from(state.sessionShots);
+      currentShots.add(shot);
+      state = state.copyWith(sessionShots: currentShots);
+    }
   }
 
   /// End current session
