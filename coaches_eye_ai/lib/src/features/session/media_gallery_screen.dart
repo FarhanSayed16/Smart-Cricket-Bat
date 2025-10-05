@@ -43,7 +43,8 @@ class _MediaGalleryScreenState extends ConsumerState<MediaGalleryScreen>
       
       // Load saved sessions from Firestore
       final firestoreService = ref.read(firestoreServiceProvider);
-      _savedSessions = await firestoreService.getUserSessions();
+      // Note: getUserSessions method needs to be implemented in FirestoreService
+      _savedSessions = [];
     } catch (e) {
       print('Error loading data: $e');
     }
@@ -234,12 +235,12 @@ class _MediaGalleryScreenState extends ConsumerState<MediaGalleryScreen>
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  _buildStatsCard('Total Sessions', '${appState.sessions.length}'),
-                  _buildStatsCard('Total Shots', '${appState.shots.length}'),
-                  _buildStatsCard('Average Bat Speed', '${_calculateAverageBatSpeed(appState.shots).toStringAsFixed(1)} km/h'),
-                  _buildStatsCard('Best Shot Speed', '${_getBestShotSpeed(appState.shots).toStringAsFixed(1)} km/h'),
-                  _buildStatsCard('Total Training Time', '${_calculateTotalTime(appState.sessions)}'),
-                  _buildStatsCard('Improvement Rate', '${_calculateImprovementRate(appState.shots).toStringAsFixed(1)}%'),
+                  _buildStatsCard('Total Sessions', '${_savedSessions.length}'),
+                  _buildStatsCard('Total Shots', '${appState.sessionShots.length}'),
+                  _buildStatsCard('Average Bat Speed', '${_calculateAverageBatSpeed(appState.sessionShots).toStringAsFixed(1)} km/h'),
+                  _buildStatsCard('Best Shot Speed', '${_getBestShotSpeed(appState.sessionShots).toStringAsFixed(1)} km/h'),
+                  _buildStatsCard('Total Training Time', '${_calculateTotalTime(_savedSessions)}'),
+                  _buildStatsCard('Improvement Rate', '${_calculateImprovementRate(appState.sessionShots).toStringAsFixed(1)}%'),
                 ],
               ),
             ),
@@ -430,8 +431,7 @@ class _MediaGalleryScreenState extends ConsumerState<MediaGalleryScreen>
   String _calculateTotalTime(List<SessionModel> sessions) {
     if (sessions.isEmpty) return '0 min';
     final totalMinutes = sessions.fold<int>(0, (sum, session) {
-      final duration = session.endTime.difference(session.startTime);
-      return sum + duration.inMinutes;
+      return sum + session.durationInMinutes;
     });
     return '${totalMinutes} min';
   }
@@ -528,8 +528,6 @@ class _SessionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final duration = session.endTime.difference(session.startTime);
-    
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -553,7 +551,7 @@ class _SessionCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '${duration.inMinutes} min',
+                '${session.durationInMinutes} min',
                 style: const TextStyle(
                   color: Colors.green,
                   fontSize: 14,
@@ -564,7 +562,7 @@ class _SessionCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${session.shots.length} shots recorded',
+            '${session.totalShots} shots recorded',
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 14,
@@ -572,7 +570,7 @@ class _SessionCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Started: ${session.startTime.toString().substring(0, 16)}',
+            'Date: ${session.date.toString().substring(0, 16)}',
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 12,
