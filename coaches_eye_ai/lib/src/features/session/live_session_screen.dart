@@ -534,16 +534,22 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
             context,
           ).showSnackBar(SnackBar(content: Text('Video saved: $_videoPath')));
         }
-      } else {
-        _videoPath = await _cameraService!.startVideoRecording();
-        setState(() => _isRecording = true);
+        } else {
+          final authState = ref.read(authStateProvider);
+          final appState = ref.read(appStateProvider);
+          
+          _videoPath = await _cameraService!.startVideoRecording(
+            sessionId: appState.currentSessionId,
+            playerId: authState.value?.uid,
+          );
+          setState(() => _isRecording = true);
 
-        if (mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Recording started')));
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Recording started')));
+          }
         }
-      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(

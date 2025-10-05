@@ -43,8 +43,13 @@ class _MediaGalleryScreenState extends ConsumerState<MediaGalleryScreen>
       
       // Load saved sessions from Firestore
       final firestoreService = ref.read(firestoreServiceProvider);
-      // Note: getUserSessions method needs to be implemented in FirestoreService
-      _savedSessions = [];
+      final authState = ref.read(authStateProvider);
+      
+      if (authState.hasValue && authState.value != null) {
+        _savedSessions = await firestoreService.getSessionsForPlayer(authState.value!.uid);
+      } else {
+        _savedSessions = [];
+      }
     } catch (e) {
       print('Error loading data: $e');
     }
