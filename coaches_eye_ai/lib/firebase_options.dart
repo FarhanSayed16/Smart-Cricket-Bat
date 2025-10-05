@@ -41,60 +41,46 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY_HERE', // Replace with your actual web API key
-    appId: 'YOUR_WEB_APP_ID_HERE', // Replace with your actual web app ID
-    messagingSenderId:
-        'YOUR_SENDER_ID_HERE', // Replace with your actual sender ID
-    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with your actual project ID
-    authDomain:
-        'YOUR_PROJECT_ID_HERE.firebaseapp.com', // Replace with your actual project ID
-    storageBucket:
-        'YOUR_PROJECT_ID_HERE.appspot.com', // Replace with your actual project ID
+    apiKey: 'AIzaSyDo7VcbqGV2ApvCqEimvMpoEDQnbTIKTqA',
+    appId: '1:419313572643:web:7b3e1fdc1bd23f67a7ca96',
+    messagingSenderId: '419313572643',
+    projectId: 'coaches-eye-ai',
+    authDomain: 'coaches-eye-ai.firebaseapp.com',
+    storageBucket: 'coaches-eye-ai.firebasestorage.app',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey:
-        'YOUR_ANDROID_API_KEY_HERE', // Replace with your actual Android API key
-    appId:
-        'YOUR_ANDROID_APP_ID_HERE', // Replace with your actual Android app ID
-    messagingSenderId:
-        'YOUR_SENDER_ID_HERE', // Replace with your actual sender ID
-    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with your actual project ID
-    storageBucket:
-        'YOUR_PROJECT_ID_HERE.appspot.com', // Replace with your actual project ID
+    apiKey: 'AIzaSyBPWEr4uWDULN8rb10n_UvN_aLN4UieSog',
+    appId: '1:419313572643:android:bb1a047e17f1f40ca7ca96',
+    messagingSenderId: '419313572643',
+    projectId: 'coaches-eye-ai',
+    storageBucket: 'coaches-eye-ai.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY_HERE', // Replace with your actual iOS API key
-    appId: 'YOUR_IOS_APP_ID_HERE', // Replace with your actual iOS app ID
-    messagingSenderId:
-        'YOUR_SENDER_ID_HERE', // Replace with your actual sender ID
-    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with your actual project ID
-    storageBucket:
-        'YOUR_PROJECT_ID_HERE.appspot.com', // Replace with your actual project ID
+    apiKey: 'AIzaSyBPWEr4uWDULN8rb10n_UvN_aLN4UieSog',
+    appId: '1:419313572643:ios:bb1a047e17f1f40ca7ca96',
+    messagingSenderId: '419313572643',
+    projectId: 'coaches-eye-ai',
+    storageBucket: 'coaches-eye-ai.firebasestorage.app',
     iosBundleId: 'com.example.coachesEyeAi',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY_HERE', // Replace with your actual iOS API key
-    appId: 'YOUR_IOS_APP_ID_HERE', // Replace with your actual iOS app ID
-    messagingSenderId:
-        'YOUR_SENDER_ID_HERE', // Replace with your actual sender ID
-    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with your actual project ID
-    storageBucket:
-        'YOUR_PROJECT_ID_HERE.appspot.com', // Replace with your actual project ID
+    apiKey: 'AIzaSyBPWEr4uWDULN8rb10n_UvN_aLN4UieSog',
+    appId: '1:419313572643:ios:bb1a047e17f1f40ca7ca96',
+    messagingSenderId: '419313572643',
+    projectId: 'coaches-eye-ai',
+    storageBucket: 'coaches-eye-ai.firebasestorage.app',
     iosBundleId: 'com.example.coachesEyeAi',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY_HERE', // Replace with your actual web API key
-    appId: 'YOUR_WEB_APP_ID_HERE', // Replace with your actual web app ID
-    messagingSenderId:
-        'YOUR_SENDER_ID_HERE', // Replace with your actual sender ID
-    projectId: 'YOUR_PROJECT_ID_HERE', // Replace with your actual project ID
-    authDomain:
-        'YOUR_PROJECT_ID_HERE.firebaseapp.com', // Replace with your actual project ID
-    storageBucket:
-        'YOUR_PROJECT_ID_HERE.appspot.com', // Replace with your actual project ID
+    apiKey: 'AIzaSyDo7VcbqGV2ApvCqEimvMpoEDQnbTIKTqA',
+    appId: '1:419313572643:web:7b3e1fdc1bd23f67a7ca96',
+    messagingSenderId: '419313572643',
+    projectId: 'coaches-eye-ai',
+    authDomain: 'coaches-eye-ai.firebaseapp.com',
+    storageBucket: 'coaches-eye-ai.firebasestorage.app',
   );
 }
