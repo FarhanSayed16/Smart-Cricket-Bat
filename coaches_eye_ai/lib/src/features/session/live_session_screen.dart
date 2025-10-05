@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/providers.dart';
 import '../../models/shot_model.dart';
+import '../../services/camera_service.dart';
 import 'session_summary_screen.dart';
 
 /// Live session screen showing real-time shot data
@@ -16,16 +17,33 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
   ShotModel? _latestShot;
   int _shotCount = 0;
   DateTime? _sessionStartTime;
+  CameraService? _cameraService;
+  bool _isRecording = false;
+  String? _videoPath;
 
   @override
   void initState() {
     super.initState();
     _sessionStartTime = DateTime.now();
+    _initializeCamera();
+  }
+
+  Future<void> _initializeCamera() async {
+    _cameraService = CameraService();
+    await _cameraService!.initialize();
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    _cameraService?.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final shotStream = ref.watch(shotStreamProvider);
     final appState = ref.watch(appStateProvider);
 
     // Listen to shot stream
@@ -141,13 +159,13 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                               const Text(
                                 'LATEST SHOT',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
-                                  letterSpacing: 2,
+                                  letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 16),
 
                               // Bat Speed
                               Row(
@@ -155,14 +173,14 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                                 children: [
                                   const Icon(
                                     Icons.speed,
-                                    size: 40,
+                                    size: 32,
                                     color: Colors.white,
                                   ),
-                                  const SizedBox(width: 16),
+                                  const SizedBox(width: 12),
                                   Text(
                                     '${_latestShot!.batSpeed.toStringAsFixed(1)}',
                                     style: const TextStyle(
-                                      fontSize: 48,
+                                      fontSize: 32,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
@@ -170,14 +188,14 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                                   const Text(
                                     ' km/h',
                                     style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       color: Colors.white,
                                     ),
                                   ),
                                 ],
                               ),
 
-                              const SizedBox(height: 32),
+                              const SizedBox(height: 20),
 
                               // Power and Timing Row
                               Row(
@@ -205,7 +223,7 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                                 ],
                               ),
 
-                              const SizedBox(height: 24),
+                              const SizedBox(height: 16),
 
                               // Sweet Spot
                               _StatDisplay(
@@ -218,6 +236,148 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                      ),
+
+                      // Camera Preview Section
+                      Expanded(
+                        flex: 2,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[900],
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey[700]!, width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 5),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Stack(
+                              children: [
+                                // Camera Preview
+                                SizedBox.expand(
+                                  child: _cameraService?.getCameraPreview() ??
+                                      Container(
+                                        color: Colors.black,
+                                        child: const Center(
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.camera_alt,
+                                                size: 80,
+                                                color: Colors.white54,
+                                              ),
+                                              SizedBox(height: 20),
+                                              Text(
+                                                'Camera Preview',
+                                                style: TextStyle(
+                                                  color: Colors.white54,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              SizedBox(height: 8),
+                                              Text(
+                                                'Live camera feed will appear here',
+                                                style: TextStyle(
+                                                  color: Colors.white38,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                ),
+                                
+                                // Recording indicator
+                                if (_isRecording)
+                                  Positioned(
+                                    top: 16,
+                                    left: 16,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.fiber_manual_record,
+                                            color: Colors.white,
+                                            size: 16,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            'REC',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                
+                                // Shot detection overlay
+                                if (_latestShot != null)
+                                  Positioned(
+                                    bottom: 16,
+                                    right: 16,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black.withOpacity(0.7),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            'Shot Detected!',
+                                            style: TextStyle(
+                                              color: Colors.green[400],
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Speed: ${_latestShot!.batSpeed.toStringAsFixed(1)} km/h',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Power: ${_latestShot!.powerIndex}',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -276,21 +436,51 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
-            child: ElevatedButton.icon(
-              onPressed: () => _showEndSessionDialog(context, ref),
-              icon: const Icon(Icons.stop),
-              label: const Text(
-                'End Session',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            child: Row(
+              children: [
+                // Camera Toggle Button
+                if (_cameraService?.isInitialized == true)
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _toggleRecording,
+                      icon: Icon(
+                        _isRecording ? Icons.videocam_off : Icons.videocam,
+                      ),
+                      label: Text(
+                        _isRecording ? 'Stop Recording' : 'Start Recording',
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _isRecording
+                            ? Colors.red
+                            : Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (_cameraService?.isInitialized == true)
+                  const SizedBox(width: 8),
+
+                // End Session Button
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showEndSessionDialog(context, ref),
+                    icon: const Icon(Icons.stop),
+                    label: const Text('End Session'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
@@ -329,6 +519,38 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
     if (accuracy >= 0.8) return Colors.lightGreen;
     if (accuracy >= 0.7) return Colors.yellow;
     return Colors.red;
+  }
+
+  Future<void> _toggleRecording() async {
+    if (_cameraService == null) return;
+
+    try {
+      if (_isRecording) {
+        _videoPath = await _cameraService!.stopVideoRecording();
+        setState(() => _isRecording = false);
+
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Video saved: $_videoPath')));
+        }
+      } else {
+        _videoPath = await _cameraService!.startVideoRecording();
+        setState(() => _isRecording = true);
+
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Recording started')));
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Camera error: $e')));
+      }
+    }
   }
 
   void _showEndSessionDialog(BuildContext context, WidgetRef ref) {
@@ -434,17 +656,17 @@ class _StatDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 4),
+        Icon(icon, color: color, size: 20),
+        const SizedBox(height: 2),
         Text(
           '$value$unit',
           style: TextStyle(
             color: color,
-            fontSize: 18,
+            fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
-        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 10)),
       ],
     );
   }
