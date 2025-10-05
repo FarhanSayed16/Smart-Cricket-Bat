@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../providers/providers.dart';
 import '../../models/session_model.dart';
 import '../session/live_session_screen.dart';
+import '../session/media_gallery_screen.dart';
 
 /// Dashboard screen showing user's session history and options
 class DashboardScreen extends ConsumerWidget {
@@ -132,6 +133,35 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
+                    // Media Gallery Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const MediaGalleryScreen(),
+                          ),
+                        ),
+                        icon: const Icon(Icons.video_library, size: 24),
+                        label: const Text(
+                          'Media Gallery',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     // Link to Coach Button
                     SizedBox(
                       width: double.infinity,
@@ -181,31 +211,37 @@ class DashboardScreen extends ConsumerWidget {
                           data: (sessions) {
                             if (sessions.isEmpty) {
                               return const Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.sports_cricket,
-                                      size: 64,
-                                      color: Colors.grey,
-                                    ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                      'No sessions yet',
-                                      style: TextStyle(
-                                        fontSize: 18,
+                                child: Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.sports_cricket,
+                                        size: 48,
                                         color: Colors.grey,
                                       ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      'Start your first training session!',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
+                                      SizedBox(height: 12),
+                                      Text(
+                                        'No sessions yet',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Start your first training session!',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             }
@@ -221,32 +257,41 @@ class DashboardScreen extends ConsumerWidget {
                           loading: () =>
                               const Center(child: CircularProgressIndicator()),
                           error: (error, stack) => Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.error_outline,
-                                  size: 64,
-                                  color: Colors.red,
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Error loading sessions',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.red[700],
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline,
+                                    size: 48,
+                                    color: Colors.red,
                                   ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  error.toString(),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    'Error loading sessions',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.red[700],
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
+                                  const SizedBox(height: 8),
+                                  Flexible(
+                                    child: Text(
+                                      error.toString(),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
