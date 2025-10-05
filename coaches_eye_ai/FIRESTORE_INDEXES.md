@@ -1,127 +1,62 @@
-# Firestore Indexes Configuration
+# Firestore Index Configuration
 
 ## Required Indexes for Coach's Eye AI
 
-### Sessions Collection Indexes
-1. **playerId + date (descending)**
-   - Collection: sessions
-   - Fields: playerId (Ascending), date (Descending)
-   - Used for: Getting sessions for a player ordered by date
+To enable proper data storage and retrieval, you need to create the following Firestore indexes in your Firebase Console.
 
-2. **playerId + date (ascending)**
-   - Collection: sessions  
-   - Fields: playerId (Ascending), date (Ascending)
-   - Used for: Getting sessions for a player in chronological order
+### 1. Sessions Collection Index
+**Collection Group**: `sessions`
+**Fields**:
+- `playerId` (Ascending)
+- `date` (Descending)
+- `__name__` (Descending)
 
-### Shots Collection Indexes
-1. **sessionId + timestamp (ascending)**
-   - Collection: shots
-   - Fields: sessionId (Ascending), timestamp (Ascending)
-   - Used for: Getting shots for a session in chronological order
+**Index URL**: https://console.firebase.google.com/v1/r/project/coaches-eye-ai/firestore/indexes?create_composite=Ck9wcm9qZWN0cy9jb2FjaGVzLWV5ZS1haS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvc2Vzc2lvbnMvaW5kZXhlcy9fEAEaDAoIcGxheWVySWQQARoICgRkYXRlEAIaDAoIX19uYW1lX18QAg
 
-2. **sessionId + timestamp (descending)**
-   - Collection: shots
-   - Fields: sessionId (Ascending), timestamp (Descending)
-   - Used for: Getting shots for a session in reverse chronological order
+### 2. Videos Collection Index
+**Collection Group**: `videos`
+**Fields**:
+- `playerId` (Ascending)
+- `recordedAt` (Descending)
+- `__name__` (Descending)
 
-### Player Profiles Collection Indexes
-1. **coachId (ascending)**
-   - Collection: playerProfiles
-   - Fields: coachId (Ascending)
-   - Used for: Getting players linked to a coach
+**Index URL**: https://console.firebase.google.com/v1/r/project/coaches-eye-ai/firestore/indexes?create_composite=Ck1wcm9qZWN0cy9jb2FjaGVzLWV5ZS1haS9kYXRhYmFzZXMvKGRlZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvdmlkZW9zL2luZGV4ZXMvXxABGgwKCHBsYXllcklkEAEaDgoKcmVjb3JkZWRBdBACGgwKCF9fbmFtZV9fEAI
 
-### Coach Profiles Collection Indexes
-1. **uid (ascending)**
-   - Collection: coachProfiles
-   - Fields: uid (Ascending)
-   - Used for: Getting coach profile by UID
+### 3. Shots Collection Index
+**Collection Group**: `shots`
+**Fields**:
+- `sessionId` (Ascending)
+- `timestamp` (Ascending)
+- `__name__` (Ascending)
 
-### Coach Invite Codes Collection Indexes
-1. **code (ascending)**
-   - Collection: coachInviteCodes
-   - Fields: code (Ascending)
-   - Used for: Looking up invite codes
+## How to Create Indexes
 
-## How to Create These Indexes
+1. **Go to Firebase Console**: https://console.firebase.google.com/project/coaches-eye-ai/firestore/indexes
+2. **Click "Create Index"**
+3. **Select Collection Group**: Choose the appropriate collection (`sessions`, `videos`, or `shots`)
+4. **Add Fields**: Add the fields in the order specified above
+5. **Set Order**: Set ascending/descending as specified
+6. **Click "Create"**
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project: `coaches-eye-ai`
-3. Go to Firestore Database → Indexes
-4. Click "Create Index"
-5. For each index above:
-   - Select the collection
-   - Add the fields in the specified order
-   - Set the sort order (Ascending/Descending)
-   - Click "Create"
+## Alternative: Use the Direct Links
 
-## Alternative: Use Firebase CLI
+You can click on the URLs provided above to directly create the indexes in Firebase Console.
 
-You can also create these indexes using the Firebase CLI:
+## After Creating Indexes
 
-```bash
-# Install Firebase CLI
-npm install -g firebase-tools
+Once the indexes are created (this may take a few minutes), the app will be able to:
+- ✅ Save and retrieve session data
+- ✅ Save and retrieve video metadata
+- ✅ Save and retrieve shot data
+- ✅ Display analytics and summaries
+- ✅ Show user performance data
 
-# Login to Firebase
-firebase login
+## Testing Data Storage
 
-# Initialize Firestore indexes
-firebase init firestore
+After creating the indexes:
+1. **Start a new session** from the dashboard
+2. **Record some shots** in the live session
+3. **Check Analytics** to see comprehensive data
+4. **View Media Gallery** to see saved sessions and videos
 
-# Deploy indexes
-firebase deploy --only firestore:indexes
-```
-
-## Index Creation URLs
-
-The error message provides direct links to create the required indexes:
-
-1. **Sessions Index**: https://console.firebase.google.com/v1/r/project/coaches-eye-ai/firestore/indexes?create_composite=Ck9wcm9qZWN0cy9jb2FjaGVzLWV5ZS1haS9kYXRhYmFzZXMvKGRIZmF1bHQpL2NvbGxlY3Rpb25Hcm91cHMvc2Vzc2lvbnMvaW5kZXhlcy9fEAEaDAolcGxheWVySWQQAROICgRkYXRIEAIaDAoIX19uYW11X18QAg
-
-Click this link to automatically create the sessions index.
-
-## Security Rules
-
-Make sure your Firestore security rules allow the required queries:
-
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    // Users can read/write their own data
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Sessions are accessible by the player who created them
-    match /sessions/{sessionId} {
-      allow read, write: if request.auth != null && 
-        resource.data.playerId == request.auth.uid;
-    }
-    
-    // Shots are accessible by the player who created them
-    match /shots/{shotId} {
-      allow read, write: if request.auth != null && 
-        resource.data.sessionId in get(/databases/$(database)/documents/sessions/$(resource.data.sessionId)).data.playerId == request.auth.uid;
-    }
-    
-    // Player profiles
-    match /playerProfiles/{playerId} {
-      allow read, write: if request.auth != null && 
-        (request.auth.uid == playerId || 
-         resource.data.coachId == request.auth.uid);
-    }
-    
-    // Coach profiles
-    match /coachProfiles/{coachId} {
-      allow read, write: if request.auth != null && request.auth.uid == coachId;
-    }
-    
-    // Coach invite codes
-    match /coachInviteCodes/{code} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
-    }
-  }
-}
-```
+The app will now properly store and display all user data, analytics, and video recordings!
