@@ -1,69 +1,31 @@
-# Coach's Eye AI - Smart Cricket Training App
+# 🏏 Smart Cricket Bat - Coach's Eye AI
 
-A Flutter mobile application that connects to a smart cricket bat equipped with ESP32 and BNO055 sensors to analyze player performance and provide real-time feedback.
+A Flutter application that uses AI to analyze cricket batting techniques and provide coaching insights.
 
-## 🏏 Features
+## 📱 **Features**
 
-### Player Features
-- **Real-time Shot Analysis**: Live monitoring of bat speed, power, timing, and sweet spot accuracy
-- **Session Management**: Track practice sessions with detailed statistics
-- **Performance Insights**: Comprehensive analysis of batting performance
-- **Data Visualization**: Charts and heatmaps for performance tracking
-- **Coach Linking**: Connect to coaches using invite codes
-- **Coach Feedback**: Receive personalized notes and feedback on shots
+- **Video Analysis**: Record and analyze cricket batting swings
+- **AI-Powered Insights**: Get detailed analysis of batting technique
+- **Coaching Tips**: Receive personalized coaching recommendations
+- **Progress Tracking**: Monitor improvement over time
+- **User Authentication**: Secure user accounts with Firebase
+- **Cloud Storage**: Store videos and analysis data securely
 
-### Coach Features
-- **Coach Dashboard**: Manage multiple players and view their progress
-- **Invite Code System**: Generate unique codes for players to join
-- **Player Performance Analysis**: Deep dive into individual player sessions
-- **Real-time Feedback**: Add notes and feedback to specific shots
-- **Session Visualization**: Charts and heatmaps for comprehensive analysis
-- **Player Management**: View all linked players and their training history
+## 🚀 **Getting Started**
 
-### Core Features
-- **User Authentication**: Secure login/signup with Firebase Auth
-- **Cloud Storage**: Session data stored in Firestore for analysis and history
-- **Role-based Access**: Separate interfaces for players and coaches
+### **Prerequisites**
 
-## 🛠️ Tech Stack
+- Flutter SDK (latest stable version)
+- Android Studio / VS Code
+- Firebase account (free tier)
+- Git
 
-- **Frontend**: Flutter 3.9.2+
-- **State Management**: Riverpod
-- **Backend**: Firebase (Auth + Firestore)
-- **Hardware**: ESP32 + BNO055 IMU sensor
-- **Development**: Hardware simulator for testing
-
-## 📱 App Structure
-
-```
-lib/
-├── src/
-│   ├── features/
-│   │   ├── auth/              # Login & Signup screens
-│   │   ├── dashboard/         # Player dashboard with session history
-│   │   ├── coach_dashboard/   # Coach dashboard and player management
-│   │   └── session/           # Live session & summary screens
-│   ├── models/                # Data models (User, Session, Shot, Profiles)
-│   ├── services/              # Firebase & hardware services
-│   ├── providers/             # Riverpod state management
-│   └── common_widgets/        # Reusable UI components
-└── main.dart                 # App entry point
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Flutter SDK 3.9.2 or higher
-- Firebase project setup
-- Android Studio / VS Code with Flutter extensions
-
-### Installation
+### **Installation**
 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd coaches_eye_ai
+   cd Smart-Cricket-Bat/coaches_eye_ai
    ```
 
 2. **Install dependencies**
@@ -72,188 +34,232 @@ lib/
    ```
 
 3. **Firebase Setup**
-   - Create a new Firebase project
-   - Enable Authentication (Email/Password)
-   - Enable Firestore Database
-   - Download `google-services.json` (Android) and `GoogleService-Info.plist` (iOS)
-   - Place them in the appropriate platform folders
+   - Follow the [Firebase Manual Setup Guide](FIREBASE_MANUAL_SETUP.md)
+   - Complete manual setup in Firebase Console
+   - Configure Flutter app with Firebase services
 
 4. **Run the app**
    ```bash
    flutter run
    ```
 
-## 🔧 Hardware Integration
+## 🔥 **Firebase Configuration**
 
-### ESP32 + BNO055 Setup
+### **Manual Setup Required**
+Since automatic Firebase setup didn't work, you need to complete the setup manually:
 
-The app is designed to work with:
-- **ESP32 DevKit V1** (or similar)
-- **BNO055 IMU sensor** for motion detection
-- **Bluetooth/WiFi** for data transmission
+- 🔧 **Create Firebase Project**: Set up project in Firebase Console
+- 🔧 **Add Android App**: Configure with `google-services.json`
+- 🔧 **Add Web App**: Configure web app
+- 🔧 **Enable Authentication**: Email/Password authentication
+- 🔧 **Create Firestore Database**: Set up database with security rules
+- 🔧 **Enable Storage**: Configure file storage with security rules
+- 🔧 **Enable Analytics**: Optional analytics tracking
+- 🔧 **Enable Performance**: Optional performance monitoring
+- 🔧 **Enable Crashlytics**: Optional crash reporting
 
-### Hardware Simulator
+**Detailed instructions**: See [FIREBASE_MANUAL_SETUP.md](FIREBASE_MANUAL_SETUP.md)
 
-For development and testing, the app includes a `HardwareSimulator` class that generates realistic shot data:
+## 📁 **Project Structure**
 
-- **Bat Speed**: 70-130 km/h (realistic cricket bat speeds)
-- **Power Index**: 60-95 (based on swing force)
-- **Timing Score**: -25 to +25 ms (early/late timing)
-- **Sweet Spot Accuracy**: 0.7-1.0 (contact quality)
-
-## 📊 Data Models
-
-### User Model
-- `uid`: Unique user identifier
-- `email`: User email address
-- `displayName`: User's display name
-- `role`: 'player' or 'coach'
-
-### Session Model
-- `sessionId`: Unique session identifier
-- `playerId`: Associated player ID
-- `date`: Session date/time
-- `durationInMinutes`: Session duration
-- `totalShots`: Number of shots taken
-- `averageBatSpeed`: Average bat speed for session
-
-### Shot Model
-- `shotId`: Unique shot identifier
-- `sessionId`: Associated session ID
-- `timestamp`: Shot timestamp
-- `batSpeed`: Bat speed in km/h
-- `powerIndex`: Power rating (0-100)
-- `timingScore`: Timing accuracy (-50 to +50 ms)
-- `sweetSpotAccuracy`: Sweet spot contact (0.0-1.0)
-- `coachNotes`: Optional coach feedback
-
-### Profile Models
-- **PlayerProfile**: Player-specific data with coach relationship
-- **CoachProfile**: Coach-specific data with linked players
-- **CoachInviteCode**: Invite code management for player-coach linking
-
-## 🔄 State Management
-
-The app uses Riverpod for state management with the following providers:
-
-### Core Providers
-- `authStateProvider`: Authentication state stream
-- `currentUserProvider`: Current user data
-- `shotStreamProvider`: Real-time shot data stream
-- `sessionsProvider`: User's session history
-- `appStateProvider`: Global app state management
-
-### Coach-Player Providers
-- `playersForCoachProvider`: Players linked to a coach
-- `coachProfileProvider`: Coach profile data
-- `playerProfileProvider`: Player profile data
-- `sessionsForPlayerByCoachProvider`: Sessions for specific player (coach view)
-
-## 🎯 Key Features Explained
-
-### Live Session Screen
-- Real-time shot data display
-- Large, easy-to-read metrics
-- Recent shots history
-- Session statistics
-- End session functionality
-
-### Dashboard Screen
-- Welcome message with user info
-- Session history list
-- Quick session start button
-- Performance overview
-
-### Session Summary Screen
-- Detailed session statistics
-- Performance insights with charts and heatmaps
-- Shot-by-shot history with coach feedback
-- Bat speed performance chart
-- Hit location heatmap (simulated)
-- Coach note system for feedback
-
-### Coach Dashboard Screen
-- Invite code generation and sharing
-- Linked players list
-- Player performance overview
-- Quick access to player sessions
-
-### Player Detail Screen (Coach View)
-- Individual player performance analysis
-- Complete session history
-- Access to detailed session summaries
-- Player-specific insights
-
-## 🔐 Authentication Flow
-
-1. **Splash Screen**: Shows while checking auth state
-2. **Login/Signup**: Email/password authentication
-3. **Dashboard**: Main app interface for authenticated users
-4. **Auto-logout**: Handles session expiration
-
-## 📈 Performance Metrics
-
-The app tracks and analyzes:
-
-- **Bat Speed**: Measured in km/h, indicates swing power
-- **Power Index**: 0-100 scale based on acceleration
-- **Timing Score**: Milliseconds early/late from optimal contact
-- **Sweet Spot Accuracy**: Quality of bat-ball contact
-
-## 🚧 Future Enhancements
-
-- **Bluetooth Integration**: Direct ESP32 connection
-- **Video Analysis**: Camera integration for swing analysis
-- **Performance Trends**: Long-term progress tracking
-- **Social Features**: Share achievements and compete
-- **AI Insights**: Machine learning for personalized feedback
-- **Advanced Analytics**: More sophisticated performance metrics
-- **Team Management**: Group coaching and team sessions
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Firebase Connection**: Ensure Firebase is properly configured
-2. **Dependencies**: Run `flutter pub get` if packages are missing
-3. **Platform Setup**: Check Android/iOS configuration files
-4. **Hardware Simulator**: Use simulator for testing without hardware
-
-### Debug Mode
-
-Enable debug logging by setting:
-```dart
-// In main.dart
-debugShowCheckedModeBanner: true;
+```
+coaches_eye_ai/
+├── android/                 # Android-specific files
+│   └── app/
+│       └── google-services.json # Firebase Android config
+├── ios/                     # iOS-specific files
+├── lib/                     # Flutter source code
+│   ├── main.dart           # App entry point
+│   ├── firebase_options.dart # Firebase configuration
+│   └── src/                # Source code
+│       ├── features/        # App features
+│       ├── models/          # Data models
+│       ├── services/        # Firebase services
+│       └── providers/       # State management
+├── FIREBASE_MANUAL_SETUP.md # Firebase setup guide
+├── pubspec.yaml            # Flutter dependencies
+└── README.md               # This file
 ```
 
-## 📝 Development Notes
+## 🛠 **Development**
 
-- The hardware simulator generates realistic data for testing
-- All Firebase operations include proper error handling
-- UI follows Material Design principles
-- Code is well-commented and documented
-- State management is centralized and efficient
+### **Firebase Services Used**
 
-## 🤝 Contributing
+- **Authentication**: User login/signup
+- **Firestore**: Database for user data and analysis results
+- **Storage**: Video file storage
+- **Analytics**: User behavior tracking
+- **Performance**: App performance monitoring
+- **Crashlytics**: Error reporting
+- **Remote Config**: Dynamic app configuration
+
+### **Key Dependencies**
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+  firebase_storage: ^11.2.6
+  firebase_analytics: ^10.7.4
+  firebase_performance: ^0.9.2+4
+  firebase_crashlytics: ^3.4.9
+  firebase_remote_config: ^4.3.8
+  firebase_messaging: ^14.7.10
+  
+  # UI & State Management
+  provider: ^6.1.1
+  flutter_riverpod: ^2.4.9
+  
+  # Video & Camera
+  camera: ^0.10.5+5
+  video_player: ^2.8.1
+  
+  # File Handling
+  path_provider: ^2.1.1
+  file_picker: ^6.1.1
+```
+
+## 📊 **Firebase Free Tier Limits**
+
+### **What's Available**
+- **Authentication**: Unlimited users
+- **Firestore**: 1GB storage, 50K reads/day, 20K writes/day
+- **Storage**: 1GB storage, 10GB/month downloads
+- **Functions**: 125K invocations/month
+- **Analytics**: Unlimited events
+- **Performance**: Unlimited traces
+- **Crashlytics**: Unlimited crash reports
+
+### **What's NOT Available**
+- **App Check**: Requires paid plan
+- **Custom Domains**: Requires paid plan
+- **Advanced Analytics**: Some features require paid plan
+
+## 🧪 **Testing**
+
+### **Run Tests**
+```bash
+flutter test
+```
+
+### **Test Firebase Integration**
+```bash
+# Test Firestore connection
+flutter test test/firestore_test.dart
+
+# Test Storage connection
+flutter test test/storage_test.dart
+```
+
+## 🚀 **Deployment**
+
+### **Android**
+```bash
+flutter build apk --release
+```
+
+### **iOS**
+```bash
+flutter build ios --release
+```
+
+### **Web**
+```bash
+flutter build web --release
+```
+
+## 🔧 **Configuration**
+
+### **Environment Variables**
+Create a `.env` file (not included in repo):
+```env
+FIREBASE_PROJECT_ID=coaches-eye-ai
+FIREBASE_STORAGE_BUCKET=coaches-eye-ai.firebasestorage.app
+FIREBASE_MESSAGING_SENDER_ID=419313572643
+```
+
+### **Firebase Configuration**
+- **Project ID**: `coaches-eye-ai`
+- **Storage Bucket**: `coaches-eye-ai.firebasestorage.app`
+- **Region**: `us-central1`
+
+## 📝 **API Documentation**
+
+### **Firestore Collections**
+- `users/{userId}` - User profiles and settings
+- `sessions/{sessionId}` - Cricket practice sessions
+- `shots/{shotId}` - Individual shot analysis
+- `analysis/{analysisId}` - AI analysis results
+
+### **Storage Structure**
+- `users/{userId}/videos/` - User video files
+- `users/{userId}/analysis/` - Analysis results
+- `public/thumbnails/` - Video thumbnails
+
+## 🐛 **Troubleshooting**
+
+### **Common Issues**
+
+1. **Firebase not initialized**
+   - Check `firebase_options.dart` is up to date
+   - Verify `google-services.json` is in `android/app/`
+
+2. **Permission denied errors**
+   - Check Firestore security rules
+   - Ensure user is authenticated
+
+3. **Storage upload failures**
+   - Enable Storage in Firebase Console
+   - Check storage security rules
+
+4. **Build errors**
+   - Run `flutter clean && flutter pub get`
+   - Check Flutter and Dart versions
+
+### **Debug Commands**
+```bash
+# Check Firebase project status
+firebase projects:list
+
+# Check deployed rules
+firebase firestore:rules:test
+
+# View Firebase logs
+firebase functions:log
+```
+
+## 🤝 **Contributing**
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly
+4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+## 📄 **License**
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📞 Support
+## 📞 **Support**
 
-For support and questions:
-- Create an issue in the repository
-- Contact the development team
-- Check the documentation
+- **Documentation**: [Firebase Manual Setup Guide](FIREBASE_MANUAL_SETUP.md)
+- **Issues**: Create an issue in this repository
+- **Firebase Console**: [Project Dashboard](https://console.firebase.google.com/project/coaches-eye-ai)
+
+## 🎯 **Roadmap**
+
+- [ ] Advanced AI analysis algorithms
+- [ ] Social sharing features
+- [ ] Coach-player collaboration
+- [ ] Advanced analytics dashboard
+- [ ] Multi-language support
+- [ ] Offline mode support
 
 ---
 
-**Happy Cricket Training! 🏏**
+**Built with ❤️ using Flutter and Firebase**
