@@ -46,7 +46,5 @@ app.*.map.json
 coaches_eye_ai/ios/
 ios/
 macos/
-windows/
-linux/
 
 
