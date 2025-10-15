@@ -6,6 +6,8 @@ import 'src/providers/providers.dart';
 import 'src/features/auth/login_screen.dart';
 import 'src/features/dashboard/dashboard_screen.dart';
 import 'src/features/coach_dashboard/coach_dashboard_screen.dart';
+import 'src/services/ble_service.dart';
+import 'src/services/error_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,8 +18,39 @@ void main() async {
   runApp(const ProviderScope(child: CoachesEyeApp()));
 }
 
-class CoachesEyeApp extends StatelessWidget {
+class CoachesEyeApp extends ConsumerStatefulWidget {
   const CoachesEyeApp({super.key});
+
+  @override
+  ConsumerState<CoachesEyeApp> createState() => _CoachesEyeAppState();
+}
+
+class _CoachesEyeAppState extends ConsumerState<CoachesEyeApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    // Handle app lifecycle changes for BLE service
+    try {
+      final bleService = ref.read(bleServiceProvider);
+      bleService.handleAppLifecycle(state);
+    } catch (e) {
+      ErrorHandler().handleError(e, context: 'App Lifecycle');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
