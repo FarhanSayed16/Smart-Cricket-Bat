@@ -4,6 +4,7 @@ import '../../providers/providers.dart';
 import '../../models/shot_model.dart';
 import '../../services/camera_service.dart';
 import 'session_summary_screen.dart';
+import '../connection/device_scan_screen.dart';
 
 /// Live session screen showing real-time shot data
 class LiveSessionScreen extends ConsumerStatefulWidget {
@@ -26,6 +27,21 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
     super.initState();
     _sessionStartTime = DateTime.now();
     _initializeCamera();
+    _initializeBLE();
+  }
+
+  Future<void> _initializeBLE() async {
+    try {
+      final bleService = ref.read(bleServiceProvider);
+      final appState = ref.read(appStateProvider);
+
+      // Start BLE session if we have a current session
+      if (appState.currentSessionId != null) {
+        bleService.startSession(appState.currentSessionId!);
+      }
+    } catch (e) {
+      print('Error initializing BLE: $e');
+    }
   }
 
   Future<void> _initializeCamera() async {
@@ -39,15 +55,23 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
   @override
   void dispose() {
     _cameraService?.dispose();
+    // Stop BLE session
+    try {
+      final bleService = ref.read(bleServiceProvider);
+      bleService.stopSession();
+    } catch (e) {
+      print('Error stopping BLE session: $e');
+    }
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final appState = ref.watch(appStateProvider);
+    final bleConnection = ref.watch(bleConnectionProvider);
 
-    // Listen to shot stream
-    ref.listen(shotStreamProvider, (previous, next) {
+    // Listen to BLE shot stream instead of simulator
+    ref.listen(bleShotStreamProvider, (previous, next) {
       next.whenData((shot) {
         setState(() {
           _latestShot = shot;
@@ -100,31 +124,90 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
             ),
           ),
 
+          // BLE Connection Status Overlay
+          if (!bleConnection.when(
+            data: (isConnected) => isConnected,
+            loading: () => false,
+            error: (_, __) => false,
+          ))
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              color: Colors.orange.shade900,
+              child: Row(
+                children: [
+                  const Icon(Icons.bluetooth_disabled, color: Colors.white),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Smart Bat not connected. Connect to start receiving shot data.',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const DeviceScanScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.orange.shade900,
+                    ),
+                    child: const Text('Connect'),
+                  ),
+                ],
+              ),
+            ),
+
           // Main Shot Display
           Expanded(
             child: _latestShot == null
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.sports_cricket,
+                          bleConnection.when(
+                            data: (isConnected) => isConnected
+                                ? Icons.sports_cricket
+                                : Icons.bluetooth_disabled,
+                            loading: () => Icons.bluetooth_searching,
+                            error: (_, __) => Icons.error,
+                          ),
                           size: 100,
                           color: Colors.grey,
                         ),
-                        SizedBox(height: 24),
+                        const SizedBox(height: 24),
                         Text(
-                          'Waiting for shots...',
-                          style: TextStyle(
+                          bleConnection.when(
+                            data: (isConnected) => isConnected
+                                ? 'Waiting for shots...'
+                                : 'Smart Bat not connected',
+                            loading: () => 'Connecting...',
+                            error: (_, __) => 'Connection error',
+                          ),
+                          style: const TextStyle(
                             fontSize: 24,
                             color: Colors.grey,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Text(
-                          'Connect your smart cricket bat',
-                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                          bleConnection.when(
+                            data: (isConnected) => isConnected
+                                ? 'Take a shot with your smart bat'
+                                : 'Connect your smart cricket bat',
+                            loading: () => 'Establishing connection...',
+                            error: (_, __) => 'Please check connection',
+                          ),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
