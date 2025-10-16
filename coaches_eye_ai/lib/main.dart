@@ -6,7 +6,6 @@ import 'src/providers/providers.dart';
 import 'src/features/auth/login_screen.dart';
 import 'src/features/dashboard/dashboard_screen.dart';
 import 'src/features/coach_dashboard/coach_dashboard_screen.dart';
-import 'src/services/ble_service.dart';
 import 'src/services/error_handler.dart';
 
 void main() async {
@@ -89,13 +88,13 @@ class AuthWrapper extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
-    final currentUser = ref.watch(currentUserProvider);
+    final currentUserProfile = ref.watch(currentUserProfileProvider);
 
     return authState.when(
       data: (user) {
         if (user != null) {
           // User is signed in, show appropriate dashboard based on role
-          return currentUser.when(
+          return currentUserProfile.when(
             data: (userModel) {
               if (userModel?.role == 'coach') {
                 return const CoachDashboardScreen();
