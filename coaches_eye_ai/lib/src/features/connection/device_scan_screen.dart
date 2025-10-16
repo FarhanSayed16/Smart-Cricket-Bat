@@ -293,7 +293,7 @@ class _DeviceScanScreenState extends ConsumerState<DeviceScanScreen> {
                             color: Colors.orange,
                           ),
                           title: Text(device.platformName),
-                          subtitle: Text('RSSI: ${device.rssi} dBm'),
+                          subtitle: Text('Smart Bat Device'),
                           trailing: ElevatedButton(
                             onPressed: () => _connectToDevice(device),
                             child: const Text('Connect'),
@@ -372,14 +372,5 @@ class _DeviceScanScreenState extends ConsumerState<DeviceScanScreen> {
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    // Stop scanning when leaving the screen
-    if (_isScanning) {
-      FlutterBluePlus.stopScan();
-    }
-    super.dispose();
   }
 }
