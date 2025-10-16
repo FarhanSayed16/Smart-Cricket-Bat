@@ -7,6 +7,7 @@ import '../session/live_session_screen.dart';
 import '../session/media_gallery_screen.dart';
 import '../analytics/analytics_screen.dart';
 import '../test/data_test_screen.dart';
+import '../connection/device_scan_screen.dart';
 
 /// Dashboard screen showing user's session history and options
 class DashboardScreen extends ConsumerWidget {
@@ -15,9 +16,11 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
+    final currentUserProfile = ref.watch(currentUserProfileProvider);
     final sessionsAsync = ref.watch(
       sessionsStreamProvider(currentUser.value?.uid ?? ''),
     );
+    final bleConnection = ref.watch(bleConnectionProvider);
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -74,7 +77,7 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      user.displayName,
+                      currentUserProfile.value?.displayName ?? 'User',
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -92,7 +95,8 @@ class DashboardScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        user.role.toUpperCase(),
+                        currentUserProfile.value?.role.toUpperCase() ??
+                            'PLAYER',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -101,6 +105,93 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              // BLE Connection Status
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Card(
+                  color: bleConnection.when(
+                    data: (isConnected) => isConnected
+                        ? Colors.green.shade50
+                        : Colors.orange.shade50,
+                    loading: () => Colors.grey.shade50,
+                    error: (_, __) => Colors.red.shade50,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.bluetooth,
+                          color: bleConnection.when(
+                            data: (isConnected) =>
+                                isConnected ? Colors.green : Colors.orange,
+                            loading: () => Colors.grey,
+                            error: (_, __) => Colors.red,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Smart Bat Connection',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: bleConnection.when(
+                                    data: (isConnected) => isConnected
+                                        ? Colors.green.shade700
+                                        : Colors.orange.shade700,
+                                    loading: () => Colors.grey.shade700,
+                                    error: (_, __) => Colors.red.shade700,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                bleConnection.when(
+                                  data: (isConnected) => isConnected
+                                      ? 'Connected'
+                                      : 'Not Connected',
+                                  loading: () => 'Checking...',
+                                  error: (_, __) => 'Error',
+                                ),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: bleConnection.when(
+                                    data: (isConnected) => isConnected
+                                        ? Colors.green.shade600
+                                        : Colors.orange.shade600,
+                                    loading: () => Colors.grey.shade600,
+                                    error: (_, __) => Colors.red.shade600,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const DeviceScanScreen(),
+                            ),
+                          ),
+                          icon: const Icon(Icons.bluetooth_searching, size: 16),
+                          label: const Text('Connect'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
 
