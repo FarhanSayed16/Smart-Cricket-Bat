@@ -368,6 +368,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ### **Documentation**
 - **Main Guide**: [README.md](README.md) - This file
+- **API Documentation**: [API_DOCUMENTATION.md](API_DOCUMENTATION.md) - Complete API reference
+- **User Guide**: [USER_GUIDE.md](USER_GUIDE.md) - End-user documentation
+- **Deployment Guide**: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) - Production deployment
+- **Troubleshooting Guide**: [TROUBLESHOOTING_GUIDE.md](TROUBLESHOOTING_GUIDE.md) - Common issues and solutions
+- **Developer Onboarding**: [DEVELOPER_ONBOARDING_GUIDE.md](DEVELOPER_ONBOARDING_GUIDE.md) - Developer setup and contribution guide
 - **Firebase Setup**: [FIREBASE_MANUAL_SETUP.md](FIREBASE_MANUAL_SETUP.md) - Complete Firebase configuration
 - **BLE Integration**: [BLE_INTEGRATION_COMPLETE.md](BLE_INTEGRATION_COMPLETE.md) - Hardware integration details
 - **Testing Guide**: [TESTING_GUIDE.md](TESTING_GUIDE.md) - Comprehensive testing procedures
