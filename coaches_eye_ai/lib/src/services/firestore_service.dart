@@ -31,6 +31,23 @@ class FirestoreService {
     }
   }
 
+  /// Get players under a specific coach
+  Future<List<UserModel>> getPlayersUnderCoach(String coachId) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('users')
+          .where('role', isEqualTo: 'player')
+          .where('coachId', isEqualTo: coachId)
+          .get();
+
+      return querySnapshot.docs
+          .map((doc) => UserModel.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      throw Exception('Failed to get players under coach: $e');
+    }
+  }
+
   /// Start a new practice session
   Future<String> startNewSession(String playerId) async {
     try {
@@ -442,17 +459,18 @@ class FirestoreService {
           .orderBy('recordedAt', descending: true)
           .get();
 
-      return querySnapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data(),
-      }).toList();
+      return querySnapshot.docs
+          .map((doc) => {'id': doc.id, ...doc.data()})
+          .toList();
     } catch (e) {
       throw Exception('Failed to get videos for player: $e');
     }
   }
 
   /// Get all videos for a specific session
-  Future<List<Map<String, dynamic>>> getVideosForSession(String sessionId) async {
+  Future<List<Map<String, dynamic>>> getVideosForSession(
+    String sessionId,
+  ) async {
     try {
       final querySnapshot = await _firestore
           .collection('videos')
@@ -460,10 +478,9 @@ class FirestoreService {
           .orderBy('recordedAt', descending: true)
           .get();
 
-      return querySnapshot.docs.map((doc) => {
-        'id': doc.id,
-        ...doc.data(),
-      }).toList();
+      return querySnapshot.docs
+          .map((doc) => {'id': doc.id, ...doc.data()})
+          .toList();
     } catch (e) {
       throw Exception('Failed to get videos for session: $e');
     }
@@ -483,7 +500,7 @@ class FirestoreService {
     try {
       // Get all sessions for the player
       final sessions = await getSessionsForPlayer(playerId);
-      
+
       // Get all shots for all sessions
       final allShots = <ShotModel>[];
       for (final session in sessions) {
@@ -508,21 +525,43 @@ class FirestoreService {
       // Calculate analytics
       final totalSessions = sessions.length;
       final totalShots = allShots.length;
-      final averageBatSpeed = allShots.map((s) => s.batSpeed).reduce((a, b) => a + b) / totalShots;
-      final bestShotSpeed = allShots.map((s) => s.batSpeed).reduce((a, b) => a > b ? a : b);
-      final totalTrainingTime = sessions.fold<int>(0, (sum, session) => sum + session.durationInMinutes);
-      
+      final averageBatSpeed =
+          allShots.map((s) => s.batSpeed).reduce((a, b) => a + b) / totalShots;
+      final bestShotSpeed = allShots
+          .map((s) => s.batSpeed)
+          .reduce((a, b) => a > b ? a : b);
+      final totalTrainingTime = sessions.fold<int>(
+        0,
+        (sum, session) => sum + session.durationInMinutes,
+      );
+
       // Calculate improvement rate
       double improvementRate = 0.0;
       if (allShots.length >= 2) {
-        final firstHalf = allShots.take(allShots.length ~/ 2).map((s) => s.batSpeed).reduce((a, b) => a + b) / (allShots.length ~/ 2);
-        final secondHalf = allShots.skip(allShots.length ~/ 2).map((s) => s.batSpeed).reduce((a, b) => a + b) / (allShots.length - allShots.length ~/ 2);
+        final firstHalf =
+            allShots
+                .take(allShots.length ~/ 2)
+                .map((s) => s.batSpeed)
+                .reduce((a, b) => a + b) /
+            (allShots.length ~/ 2);
+        final secondHalf =
+            allShots
+                .skip(allShots.length ~/ 2)
+                .map((s) => s.batSpeed)
+                .reduce((a, b) => a + b) /
+            (allShots.length - allShots.length ~/ 2);
         improvementRate = ((secondHalf - firstHalf) / firstHalf) * 100;
       }
 
-      final averagePowerIndex = allShots.map((s) => s.powerIndex).reduce((a, b) => a + b) / totalShots;
-      final averageTimingScore = allShots.map((s) => s.timingScore).reduce((a, b) => a + b) / totalShots;
-      final averageSweetSpotAccuracy = allShots.map((s) => s.sweetSpotAccuracy).reduce((a, b) => a + b) / totalShots;
+      final averagePowerIndex =
+          allShots.map((s) => s.powerIndex).reduce((a, b) => a + b) /
+          totalShots;
+      final averageTimingScore =
+          allShots.map((s) => s.timingScore).reduce((a, b) => a + b) /
+          totalShots;
+      final averageSweetSpotAccuracy =
+          allShots.map((s) => s.sweetSpotAccuracy).reduce((a, b) => a + b) /
+          totalShots;
 
       return {
         'totalSessions': totalSessions,
