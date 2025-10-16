@@ -5,12 +5,14 @@ class UserModel {
   final String email;
   final String displayName;
   final String role; // 'player' or 'coach'
+  final String? coachId; // Optional - only for players
 
   const UserModel({
     required this.uid,
     required this.email,
     required this.displayName,
     required this.role,
+    this.coachId,
   });
 
   /// Create UserModel from Firestore document
@@ -20,6 +22,7 @@ class UserModel {
       email: json['email'] as String,
       displayName: json['displayName'] as String,
       role: json['role'] as String,
+      coachId: json['coachId'] as String?,
     );
   }
 
@@ -30,6 +33,7 @@ class UserModel {
       'email': email,
       'displayName': displayName,
       'role': role,
+      'coachId': coachId,
     };
   }
 
@@ -39,18 +43,20 @@ class UserModel {
     String? email,
     String? displayName,
     String? role,
+    String? coachId,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
       email: email ?? this.email,
       displayName: displayName ?? this.displayName,
       role: role ?? this.role,
+      coachId: coachId ?? this.coachId,
     );
   }
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, role: $role)';
+    return 'UserModel(uid: $uid, email: $email, displayName: $displayName, role: $role, coachId: $coachId)';
   }
 
   @override
