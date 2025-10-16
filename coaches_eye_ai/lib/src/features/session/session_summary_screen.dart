@@ -12,7 +12,10 @@ class SessionSummaryScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appState = ref.watch(appStateProvider);
-    final sessionStats = ref.watch(sessionStatsProvider(appState.sessionShots));
+    final currentUserProfile = ref.watch(currentUserProfileProvider);
+    final sessionStats = ref.watch(
+      sessionStatsProvider(appState.currentSessionId ?? ''),
+    );
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -64,7 +67,12 @@ class SessionSummaryScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Summary Cards
-                  _SummaryCards(stats: sessionStats),
+                  sessionStats.when(
+                    data: (stats) => _SummaryCards(stats: stats),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (error, _) => Text('Error: $error'),
+                  ),
                   const SizedBox(height: 24),
 
                   // Performance Chart
@@ -76,7 +84,12 @@ class SessionSummaryScreen extends ConsumerWidget {
                   const SizedBox(height: 24),
 
                   // Performance Insights
-                  _PerformanceInsights(stats: sessionStats),
+                  sessionStats.when(
+                    data: (stats) => _PerformanceInsights(stats: stats),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (error, _) => Text('Error: $error'),
+                  ),
                   const SizedBox(height: 24),
 
                   // Shot History
@@ -722,6 +735,7 @@ class _ShotListItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserProvider);
+    final currentUserProfile = ref.watch(currentUserProfileProvider);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -806,9 +820,9 @@ class _ShotListItem extends ConsumerWidget {
               ),
 
               // Coach Note Button (only for coaches)
-              currentUser.when(
-                data: (user) {
-                  if (user?.role == 'coach') {
+              currentUserProfile.when(
+                data: (userModel) {
+                  if (userModel?.role == 'coach') {
                     return IconButton(
                       icon: Icon(
                         shot.coachNotes != null ? Icons.note : Icons.note_add,
