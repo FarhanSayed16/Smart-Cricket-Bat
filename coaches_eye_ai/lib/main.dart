@@ -7,12 +7,23 @@ import 'src/features/auth/login_screen.dart';
 import 'src/features/dashboard/dashboard_screen.dart';
 import 'src/features/coach_dashboard/coach_dashboard_screen.dart';
 import 'src/services/error_handler.dart';
+import 'src/services/permission_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Request permissions on app start
+  try {
+    print('🔐 Requesting app permissions...');
+    final permissionManager = PermissionManager();
+    await permissionManager.requestAllPermissions();
+    print('✅ Permissions requested');
+  } catch (e) {
+    print('❌ Permission request error: $e');
+  }
 
   runApp(const ProviderScope(child: CoachesEyeApp()));
 }
