@@ -27,41 +27,39 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
     super.initState();
     _sessionStartTime = DateTime.now();
     _initializeCamera();
-    _initializeBLE();
-  }
-
-  Future<void> _initializeBLE() async {
-    try {
-      final bleService = ref.read(bleServiceProvider);
-      final appState = ref.read(appStateProvider);
-
-      // Start BLE session if we have a current session
-      if (appState.currentSessionId != null) {
-        bleService.startSession(appState.currentSessionId!);
-      }
-    } catch (e) {
-      print('Error initializing BLE: $e');
-    }
   }
 
   Future<void> _initializeCamera() async {
-    _cameraService = CameraService();
-    await _cameraService!.initialize();
-    if (mounted) {
-      setState(() {});
+    try {
+      print('🎥 Initializing camera for live session...');
+      _cameraService = CameraService();
+      final success = await _cameraService!.initialize();
+
+      if (success) {
+        print('✅ Camera initialized successfully');
+      } else {
+        print('❌ Camera initialization failed');
+      }
+
+      if (mounted) {
+        setState(() {});
+      }
+    } catch (e) {
+      print('❌ Camera initialization error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Camera initialization failed: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   @override
   void dispose() {
     _cameraService?.dispose();
-    // Stop BLE session
-    try {
-      final bleService = ref.read(bleServiceProvider);
-      bleService.stopSession();
-    } catch (e) {
-      print('Error stopping BLE session: $e');
-    }
     super.dispose();
   }
 
@@ -70,9 +68,12 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
     final appState = ref.watch(appStateProvider);
     final bleConnection = ref.watch(bleConnectionProvider);
 
-    // Listen to BLE shot stream instead of simulator
-    ref.listen(bleShotStreamProvider, (previous, next) {
+    // Listen to ESP32 shot stream (real hardware data only)
+    ref.listen(esp32ShotStreamProvider, (previous, next) {
       next.whenData((shot) {
+        print(
+          '📡 ESP32 Shot received: ${shot.batSpeed} km/h, Power: ${shot.powerIndex}%',
+        );
         setState(() {
           _latestShot = shot;
           _shotCount++;
@@ -97,70 +98,160 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
       ),
       body: Column(
         children: [
-          // Session Info Header
+          // Enhanced Session Analytics Header
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             color: Colors.grey[900],
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            child: Column(
               children: [
-                _SessionInfoItem(
-                  icon: Icons.timer,
-                  label: 'Duration',
-                  value: _getSessionDuration(),
+                // Main stats row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _SessionInfoItem(
+                      icon: Icons.timer,
+                      label: 'Duration',
+                      value: _getSessionDuration(),
+                    ),
+                    _SessionInfoItem(
+                      icon: Icons.sports_cricket,
+                      label: 'Shots',
+                      value: '$_shotCount',
+                    ),
+                    _SessionInfoItem(
+                      icon: Icons.speed,
+                      label: 'Avg Speed',
+                      value: _getAverageSpeed(),
+                    ),
+                  ],
                 ),
-                _SessionInfoItem(
-                  icon: Icons.sports_cricket,
-                  label: 'Shots',
-                  value: '$_shotCount',
-                ),
-                _SessionInfoItem(
-                  icon: Icons.speed,
-                  label: 'Avg Speed',
-                  value: _getAverageSpeed(),
+                const SizedBox(height: 8),
+
+                // Additional analytics row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _SessionInfoItem(
+                      icon: Icons.flash_on,
+                      label: 'Avg Power',
+                      value: _getAveragePower(),
+                    ),
+                    _SessionInfoItem(
+                      icon: Icons.center_focus_strong,
+                      label: 'Sweet Spot',
+                      value: _getAverageSweetSpot(),
+                    ),
+                    _SessionInfoItem(
+                      icon: Icons.trending_up,
+                      label: 'Timing',
+                      value: _getAverageTiming(),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // BLE Connection Status Overlay
-          if (!bleConnection.when(
-            data: (isConnected) => isConnected,
-            loading: () => false,
-            error: (_, __) => false,
-          ))
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              color: Colors.orange.shade900,
-              child: Row(
-                children: [
-                  const Icon(Icons.bluetooth_disabled, color: Colors.white),
-                  const SizedBox(width: 8),
-                  const Expanded(
-                    child: Text(
-                      'Smart Bat not connected. Connect to start receiving shot data.',
-                      style: TextStyle(color: Colors.white),
+          // ESP32 Connection Status
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[900],
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const DeviceScanScreen(),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.bluetooth, color: Colors.white),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'ESP32 Smart Bat',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.orange.shade900,
+                        Text(
+                          bleConnection.when(
+                            data: (isConnected) =>
+                                isConnected ? 'Connected' : 'Disconnected',
+                            loading: () => 'Connecting...',
+                            error: (_, __) => 'Error',
+                          ),
+                          style: TextStyle(
+                            color: bleConnection.when(
+                              data: (isConnected) =>
+                                  isConnected ? Colors.green : Colors.red,
+                              loading: () => Colors.yellow,
+                              error: (_, __) => Colors.red,
+                            ),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
-                    child: const Text('Connect'),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const DeviceScanScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.bluetooth_searching),
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
             ),
+          ),
+
+          // ESP32 Status Panel
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            color: Colors.grey[800],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'ESP32 Status:',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Shots Received: $_shotCount',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+                Text(
+                  'Session Duration: ${_getSessionDuration()}',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+                Text(
+                  'BLE Status: ${bleConnection.when(data: (isConnected) => isConnected ? "Connected" : "Disconnected", loading: () => "Loading...", error: (_, __) => "Error")}',
+                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
 
           // Main Shot Display
           Expanded(
@@ -170,43 +261,45 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          bleConnection.when(
-                            data: (isConnected) => isConnected
-                                ? Icons.sports_cricket
-                                : Icons.bluetooth_disabled,
-                            loading: () => Icons.bluetooth_searching,
-                            error: (_, __) => Icons.error,
-                          ),
+                          Icons.bluetooth_searching,
                           size: 100,
                           color: Colors.grey,
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          bleConnection.when(
-                            data: (isConnected) => isConnected
-                                ? 'Waiting for shots...'
-                                : 'Smart Bat not connected',
-                            loading: () => 'Connecting...',
-                            error: (_, __) => 'Connection error',
-                          ),
+                          'Waiting for ESP32 data...',
                           style: const TextStyle(
-                            fontSize: 24,
                             color: Colors.grey,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          bleConnection.when(
-                            data: (isConnected) => isConnected
-                                ? 'Take a shot with your smart bat'
-                                : 'Connect your smart cricket bat',
-                            loading: () => 'Establishing connection...',
-                            error: (_, __) => 'Please check connection',
-                          ),
+                          'Connect your ESP32 Smart Bat to start receiving shot data',
                           style: const TextStyle(
-                            fontSize: 16,
                             color: Colors.grey,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const DeviceScanScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.bluetooth_searching),
+                          label: const Text('Connect ESP32'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                       ],
@@ -584,9 +677,55 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
   }
 
   String _getAverageSpeed() {
-    if (_shotCount == 0) return '0.0';
-    // This would be calculated from all shots, but for simplicity showing latest
-    return _latestShot?.batSpeed.toStringAsFixed(1) ?? '0.0';
+    if (_shotCount == 0) return '0 km/h';
+    final appState = ref.read(appStateProvider);
+    if (appState.sessionShots.isEmpty) return '0 km/h';
+
+    final totalSpeed = appState.sessionShots.fold<double>(
+      0.0,
+      (sum, shot) => sum + shot.batSpeed,
+    );
+    final average = totalSpeed / appState.sessionShots.length;
+    return '${average.toStringAsFixed(1)} km/h';
+  }
+
+  String _getAveragePower() {
+    if (_shotCount == 0) return '0%';
+    final appState = ref.read(appStateProvider);
+    if (appState.sessionShots.isEmpty) return '0%';
+
+    final totalPower = appState.sessionShots.fold<double>(
+      0.0,
+      (sum, shot) => sum + shot.powerIndex,
+    );
+    final average = totalPower / appState.sessionShots.length;
+    return '${average.toStringAsFixed(0)}%';
+  }
+
+  String _getAverageSweetSpot() {
+    if (_shotCount == 0) return '0%';
+    final appState = ref.read(appStateProvider);
+    if (appState.sessionShots.isEmpty) return '0%';
+
+    final totalSweetSpot = appState.sessionShots.fold<double>(
+      0.0,
+      (sum, shot) => sum + shot.sweetSpotAccuracy,
+    );
+    final average = totalSweetSpot / appState.sessionShots.length;
+    return '${(average * 100).toStringAsFixed(0)}%';
+  }
+
+  String _getAverageTiming() {
+    if (_shotCount == 0) return '0ms';
+    final appState = ref.read(appStateProvider);
+    if (appState.sessionShots.isEmpty) return '0ms';
+
+    final totalTiming = appState.sessionShots.fold<double>(
+      0.0,
+      (sum, shot) => sum + shot.timingScore.abs(),
+    );
+    final average = totalTiming / appState.sessionShots.length;
+    return '${average.toStringAsFixed(1)}ms';
   }
 
   Color _getPowerColor(int power) {
