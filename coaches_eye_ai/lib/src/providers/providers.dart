@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
-import '../services/hardware_simulator.dart';
 import '../services/ble_service.dart';
 import '../models/user_model.dart';
 import '../models/session_model.dart';
@@ -20,12 +19,7 @@ final firestoreServiceProvider = Provider<FirestoreService>((ref) {
   return FirestoreService();
 });
 
-/// Provider for HardwareSimulator
-final hardwareSimulatorProvider = Provider<HardwareSimulator>((ref) {
-  return HardwareSimulator();
-});
-
-/// Provider for BLEService
+/// Provider for BLEService (ESP32 data only)
 final bleServiceProvider = Provider<BLEService>((ref) {
   return BLEService();
 });
@@ -118,8 +112,8 @@ final bleScanProvider = StreamProvider<List<BluetoothDevice>>((ref) {
   return bleService.scanStream;
 });
 
-/// Provider for BLE shot stream
-final bleShotStreamProvider = StreamProvider<ShotModel>((ref) {
+/// Provider for ESP32 shot stream (real hardware data only)
+final esp32ShotStreamProvider = StreamProvider<ShotModel>((ref) {
   final bleService = ref.watch(bleServiceProvider);
   return bleService.shotStream;
 });
@@ -197,9 +191,9 @@ class AppStateNotifier extends StateNotifier<AppState> {
       final firestoreService = ref.read(firestoreServiceProvider);
       final sessionId = await firestoreService.startNewSession(playerId);
 
-      // Start hardware simulator
-      final simulator = ref.read(hardwareSimulatorProvider);
-      simulator.startSession(sessionId);
+      // Start ESP32 BLE service for real hardware data
+      final bleService = ref.read(bleServiceProvider);
+      bleService.startSession(sessionId);
 
       state = state.copyWith(
         isLoading: false,
@@ -234,9 +228,9 @@ class AppStateNotifier extends StateNotifier<AppState> {
   /// End current session
   Future<void> endSession() async {
     try {
-      // Stop hardware simulator
-      final simulator = ref.read(hardwareSimulatorProvider);
-      simulator.stopSession();
+      // Stop ESP32 BLE service
+      final bleService = ref.read(bleServiceProvider);
+      bleService.stopSession();
 
       state = state.copyWith(currentSessionId: null, sessionShots: []);
     } catch (e) {
