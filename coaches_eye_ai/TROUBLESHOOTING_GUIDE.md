@@ -1,556 +1,211 @@
-# 🛠️ Troubleshooting Guide - Smart Cricket Bat App
+# 🔧 Troubleshooting Guide - ESP32 & Flutter BLE Connection Issues
 
-## Overview
+## 🚨 **Your Current Issues**
 
-This comprehensive troubleshooting guide helps you resolve common issues with the Smart Cricket Bat app, from basic setup problems to advanced hardware integration issues.
+### **ESP32 Issues:**
+- ❌ I2C NACK errors with BNO055 sensor
+- ✅ BLE advertising works but Flutter can't find device
+- ⚠️ Sensor initializes despite I2C errors
 
----
+### **Flutter Issues:**
+- ❌ No devices found during scan
+- ✅ BLE service initializes successfully
+- ❌ Cannot connect to ESP32
 
-## 🚨 Quick Fixes
+## 🛠️ **Solutions Applied**
 
-### App Won't Start
-**Symptoms**: App crashes on startup or shows blank screen
+### **1. Enhanced Arduino Code (`communicationcodetest1_ENHANCED.INO`)**
 
-**Quick Solutions**:
-1. **Restart the app**: Close completely and reopen
-2. **Restart your device**: Power off and on
-3. **Check storage**: Ensure sufficient storage space
-4. **Update app**: Check for app updates
-5. **Reinstall**: Uninstall and reinstall the app
+**Key Improvements:**
+- 🔧 **Better I2C Configuration**: Slower clock speed (100kHz) for stability
+- 🔄 **Sensor Retry Logic**: 5 attempts with delays between retries
+- 📡 **Enhanced BLE Advertising**: Better discovery settings
+- 🐛 **Detailed Debug Output**: Clear status messages
+- ⚡ **Error Handling**: Graceful sensor read failures
 
-**Advanced Solutions**:
-```bash
-# Clear app data (Android)
-adb shell pm clear com.coacheseyeai.smartcricketbat
-
-# Reset app permissions
-# Go to Settings > Apps > Coach's Eye AI > Permissions
-# Reset all permissions and re-grant them
+**Expected Serial Output:**
+```
+--- Smart Bat BLE - Enhanced Debug Version ---
+Attempting to initialize BNO055 sensor...
+Sensor initialization attempt 1/5...
+✅ BNO055 Sensor Initialized Successfully!
+Initializing BLE...
+📡 BLE Advertising Started - Device Name: 'Smart Bat'
+🔍 Waiting for Flutter app connection...
+📋 Service UUID: 4fafc201-1fb5-459e-8fcc-c5c9c331914b
+📋 Characteristic UUID: beb5483e-36e1-4688-b7f5-ea07361b26a8
+📡 Still advertising... Waiting for connection
 ```
 
-### Can't Connect to Smart Bat
-**Symptoms**: App shows "Not Connected" or connection fails
+### **2. Enhanced Flutter BLE Scanning**
 
-**Quick Solutions**:
-1. **Check Bluetooth**: Ensure Bluetooth is enabled
-2. **Check battery**: Verify Smart Bat is charged
-3. **Restart connection**: Turn Smart Bat off/on
-4. **Check distance**: Stay within 10 meters
-5. **Restart app**: Close and reopen the app
+**Key Improvements:**
+- 🔍 **Aggressive Scanning**: Low latency mode for Android
+- 📱 **Better Device Filtering**: Case-insensitive name matching
+- 🐛 **Debug Logging**: Shows all found devices
+- ⏱️ **Longer Scan Time**: 20 seconds instead of 15
+- 📍 **Location Services**: Enabled for better discovery
 
-**Advanced Solutions**:
-```dart
-// Reset BLE service
-final bleService = BLEService();
-await bleService.dispose();
-// Reinitialize and try again
+**Expected Flutter Output:**
+```
+🔍 Starting device scan...
+Starting scan for Smart Bat devices...
+Scan results count: 3
+Found device: Smart Bat (AA:BB:CC:DD:EE:FF)
+✅ Added Smart Bat device: Smart Bat
+Scan completed
 ```
 
----
+## 🔧 **Step-by-Step Troubleshooting**
 
-## 📱 App Issues
+### **Step 1: Upload Enhanced Arduino Code**
 
-### Authentication Problems
+1. **Upload** `communicationcodetest1_ENHANCED.INO` to your ESP32
+2. **Open Serial Monitor** at 115200 baud
+3. **Check for these messages:**
+   - ✅ "BNO055 Sensor Initialized Successfully!" (sensor working)
+   - ⚠️ "WARNING: BNO055 sensor not detected" (sensor issues)
+   - 📡 "BLE Advertising Started - Device Name: 'Smart Bat'" (BLE working)
 
-#### Can't Sign In
-**Symptoms**: Login fails with error messages
+### **Step 2: Check ESP32 Wiring**
 
-**Solutions**:
-1. **Check credentials**: Verify email and password
-2. **Reset password**: Use "Forgot Password" feature
-3. **Check internet**: Ensure stable internet connection
-4. **Clear cache**: Clear app cache and data
-5. **Contact support**: If problem persists
-
-**Error Messages**:
-- **"User not found"**: Email doesn't exist in system
-- **"Wrong password"**: Incorrect password entered
-- **"Too many attempts"**: Wait 15 minutes before retrying
-- **"Network error"**: Check internet connection
-
-#### Can't Sign Up
-**Symptoms**: Registration fails or account creation errors
-
-**Solutions**:
-1. **Check email format**: Ensure valid email address
-2. **Strong password**: Use 8+ characters with numbers/symbols
-3. **Check internet**: Stable connection required
-4. **Try different email**: Email might already exist
-5. **Contact support**: For persistent issues
-
-### Session Issues
-
-#### Session Won't Start
-**Symptoms**: Can't begin new training session
-
-**Solutions**:
-1. **Check permissions**: Grant camera and storage permissions
-2. **Check storage**: Ensure sufficient storage space
-3. **Restart app**: Close and reopen
-4. **Check internet**: Required for session initialization
-5. **Try simulator mode**: Use hardware simulator if available
-
-#### Session Data Not Saving
-**Symptoms**: Session data disappears or doesn't save
-
-**Solutions**:
-1. **Check internet**: Stable connection required
-2. **Check Firebase**: Verify Firebase connection
-3. **Restart session**: End and start new session
-4. **Check storage**: Ensure sufficient storage
-5. **Contact support**: For data recovery
-
-### Video Recording Issues
-
-#### Camera Won't Start
-**Symptoms**: Camera fails to initialize or record
-
-**Solutions**:
-1. **Grant permissions**: Allow camera access
-2. **Check storage**: Ensure sufficient storage space
-3. **Restart camera**: Close and reopen camera
-4. **Check other apps**: Close other camera apps
-5. **Restart device**: Power cycle if needed
-
-#### Video Quality Issues
-**Symptoms**: Poor video quality or recording problems
-
-**Solutions**:
-1. **Check settings**: Adjust video quality in settings
-2. **Check storage**: Low storage affects quality
-3. **Clean lens**: Clean camera lens
-4. **Check lighting**: Ensure adequate lighting
-5. **Update app**: Check for app updates
-
----
-
-## 🔗 Bluetooth & Hardware Issues
-
-### BLE Connection Problems
-
-#### Device Not Found
-**Symptoms**: Smart Bat doesn't appear in scan results
-
-**Solutions**:
-1. **Check power**: Ensure Smart Bat is powered on
-2. **Check battery**: Low battery affects discovery
-3. **Check distance**: Stay within 10 meters
-4. **Restart scan**: Stop and restart scanning
-5. **Check interference**: Avoid areas with many Bluetooth devices
-
-**Advanced Troubleshooting**:
-```dart
-// Check Bluetooth availability
-final bleService = BLEService();
-final isAvailable = await bleService.isBluetoothAvailable();
-print('Bluetooth available: $isAvailable');
-
-// Check permissions
-final hasPermissions = await bleService.requestPermissions();
-print('Permissions granted: $hasPermissions');
+**BNO055 Wiring to ESP32:**
+```
+BNO055    ESP32
+VCC   →   3.3V
+GND   →   GND
+SDA   →   GPIO21
+SCL   →   GPIO22
 ```
 
-#### Connection Timeout
-**Symptoms**: Connection attempt times out
+**Common Wiring Issues:**
+- 🔌 **Loose connections**: Push wires firmly into breadboard
+- ⚡ **Power issues**: Use 3.3V, not 5V
+- 🔗 **Wrong pins**: Double-check SDA/SCL connections
+- 📏 **Long wires**: Keep I2C wires short (< 20cm)
 
-**Solutions**:
-1. **Check distance**: Move closer to Smart Bat
-2. **Check battery**: Ensure sufficient charge
-3. **Restart both**: Turn off Smart Bat and restart app
-4. **Check interference**: Move to different location
-5. **Update firmware**: Check for Smart Bat firmware updates
+### **Step 3: Test Flutter App**
 
-#### Frequent Disconnections
-**Symptoms**: Connection drops frequently during use
+1. **Run the Flutter app**
+2. **Go to Dashboard** → Tap "Connect"
+3. **Tap "Scan for Smart Bat"**
+4. **Watch console output** for debug messages
+5. **Look for**: "Found device: Smart Bat"
 
-**Solutions**:
-1. **Check distance**: Stay within 5 meters
-2. **Check battery**: Low battery causes disconnections
-3. **Check interference**: Avoid WiFi routers, microwaves
-4. **Restart connection**: Reconnect when needed
-5. **Check firmware**: Update Smart Bat firmware
+### **Step 4: Debug BLE Discovery**
 
-### Hardware Issues
+**If ESP32 shows advertising but Flutter finds nothing:**
 
-#### No Shot Detection
-**Symptoms**: App doesn't detect cricket shots
+**Check Android Settings:**
+- 📱 **Bluetooth**: Turn off/on
+- 📍 **Location**: Enable location services
+- 🔒 **Permissions**: Grant location permission to app
+- 🔄 **Restart**: Restart phone and ESP32
 
-**Solutions**:
-1. **Check mounting**: Ensure sensor is properly attached
-2. **Check calibration**: Recalibrate sensors
-3. **Check sensitivity**: Adjust detection sensitivity
-4. **Check battery**: Low battery affects sensors
-5. **Test hardware**: Use hardware test mode
+**Check ESP32:**
+- 📡 **Advertising**: Should show "Still advertising..." every 5 seconds
+- 🔋 **Power**: Ensure stable power supply
+- 📶 **Range**: Keep ESP32 within 1 meter of phone
 
-#### Inaccurate Data
-**Symptoms**: Shot data seems incorrect or unrealistic
+## 🧪 **Testing Procedure**
 
-**Solutions**:
-1. **Recalibrate**: Recalibrate Smart Bat sensors
-2. **Check mounting**: Ensure proper sensor alignment
-3. **Check firmware**: Update to latest firmware
-4. **Check environment**: Avoid magnetic interference
-5. **Contact support**: For hardware issues
-
-#### Battery Issues
-**Symptoms**: Smart Bat battery drains quickly or won't charge
-
-**Solutions**:
-1. **Check charger**: Verify charger is working
-2. **Check cable**: Try different USB cable
-3. **Check port**: Clean charging port
-4. **Check battery**: Battery may need replacement
-5. **Contact support**: For hardware warranty
-
----
-
-## 🔥 Firebase Issues
-
-### Authentication Errors
-
-#### Firebase Auth Not Working
-**Symptoms**: Can't authenticate with Firebase
-
-**Solutions**:
-1. **Check internet**: Stable connection required
-2. **Check Firebase config**: Verify configuration
-3. **Check API keys**: Ensure valid API keys
-4. **Check project**: Verify Firebase project is active
-5. **Contact support**: For configuration issues
-
-#### Firestore Errors
-**Symptoms**: Data not saving or loading from Firestore
-
-**Solutions**:
-1. **Check internet**: Stable connection required
-2. **Check rules**: Verify Firestore security rules
-3. **Check permissions**: Ensure proper user permissions
-4. **Check project**: Verify Firestore is enabled
-5. **Check quotas**: Ensure not exceeding limits
-
-### Storage Issues
-
-#### File Upload Fails
-**Symptoms**: Videos or photos won't upload
-
-**Solutions**:
-1. **Check internet**: Stable connection required
-2. **Check storage**: Ensure sufficient Firebase storage
-3. **Check file size**: Large files may timeout
-4. **Check permissions**: Verify storage permissions
-5. **Retry upload**: Try uploading again
-
-#### File Download Issues
-**Symptoms**: Can't download saved files
-
-**Solutions**:
-1. **Check internet**: Stable connection required
-2. **Check permissions**: Verify file access permissions
-3. **Check file exists**: Ensure file wasn't deleted
-4. **Check storage**: Ensure sufficient local storage
-5. **Contact support**: For file recovery
-
----
-
-## 📊 Performance Issues
-
-### App Performance
-
-#### Slow Performance
-**Symptoms**: App runs slowly or freezes
-
-**Solutions**:
-1. **Close other apps**: Free up device memory
-2. **Restart device**: Clear memory and cache
-3. **Check storage**: Ensure sufficient storage space
-4. **Update app**: Install latest version
-5. **Check device**: Ensure device meets requirements
-
-#### High Battery Usage
-**Symptoms**: App drains battery quickly
-
-**Solutions**:
-1. **Close app**: When not in use
-2. **Disable BLE**: Turn off Bluetooth when not needed
-3. **Reduce video quality**: Lower recording quality
-4. **Check background**: Disable background processing
-5. **Update app**: Latest version may be more efficient
-
-### Memory Issues
-
-#### Out of Memory
-**Symptoms**: App crashes with memory errors
-
-**Solutions**:
-1. **Close other apps**: Free up device memory
-2. **Restart device**: Clear memory
-3. **Check storage**: Ensure sufficient storage
-4. **Reduce video quality**: Lower recording quality
-5. **Update app**: Latest version may be optimized
-
-#### Memory Leaks
-**Symptoms**: App becomes slower over time
-
-**Solutions**:
-1. **Restart app**: Close and reopen regularly
-2. **Update app**: Latest version may fix leaks
-3. **Check usage**: Monitor memory usage
-4. **Contact support**: Report persistent issues
-5. **Reinstall**: Fresh installation may help
-
----
-
-## 🌐 Network Issues
-
-### Internet Connection
-
-#### No Internet Connection
-**Symptoms**: App can't connect to internet
-
-**Solutions**:
-1. **Check WiFi**: Ensure WiFi is connected
-2. **Check mobile data**: Enable mobile data if needed
-3. **Check signal**: Ensure strong signal
-4. **Restart network**: Turn off/on WiFi or mobile data
-5. **Check router**: Restart router if using WiFi
-
-#### Slow Internet
-**Symptoms**: App loads slowly or times out
-
-**Solutions**:
-1. **Check speed**: Test internet speed
-2. **Move closer**: Get closer to WiFi router
-3. **Check interference**: Avoid interference sources
-4. **Switch networks**: Try different WiFi or mobile data
-5. **Contact ISP**: For persistent slow speeds
-
-### API Issues
-
-#### API Timeout
-**Symptoms**: API calls timeout or fail
-
-**Solutions**:
-1. **Check internet**: Ensure stable connection
-2. **Retry request**: Try again after delay
-3. **Check server**: Verify server is running
-4. **Check API limits**: Ensure not exceeding limits
-5. **Contact support**: For persistent API issues
-
-#### API Errors
-**Symptoms**: API returns error codes
-
-**Solutions**:
-1. **Check error code**: Look up specific error
-2. **Check parameters**: Verify request parameters
-3. **Check authentication**: Ensure valid credentials
-4. **Check permissions**: Verify API permissions
-5. **Contact support**: For API configuration issues
-
----
-
-## 🔧 Advanced Troubleshooting
-
-### Debug Mode
-
-#### Enable Debug Logging
-```dart
-// Enable debug mode
-const bool debugMode = true;
-
-// Add debug logging
-if (debugMode) {
-  print('BLE Connection State: $connectionState');
-  print('Shot Data: $shotData');
-  print('Error: $error');
-}
+### **Test 1: ESP32 Standalone**
+```
+1. Upload enhanced code
+2. Open Serial Monitor
+3. Verify: "BLE Advertising Started"
+4. Should see: "Still advertising..." every 5 seconds
 ```
 
-#### Check Debug Information
-1. **Enable developer options** on your device
-2. **Enable USB debugging** (Android)
-3. **Check logcat** for error messages
-4. **Use Flutter inspector** for UI debugging
-5. **Check Firebase console** for backend errors
-
-### Hardware Testing
-
-#### Test BLE Connection
-```dart
-// Test BLE service
-final bleService = BLEService();
-
-// Test scanning
-final devices = await bleService.scanForDevices();
-print('Found devices: ${devices.length}');
-
-// Test connection
-if (devices.isNotEmpty) {
-  await bleService.connectToDevice(devices.first);
-  print('Connection state: ${bleService.isConnected}');
-}
+### **Test 2: Flutter Discovery**
+```
+1. Run Flutter app
+2. Go to connection screen
+3. Tap "Scan for Smart Bat"
+4. Watch console for: "Found device: Smart Bat"
+5. Device should appear in list
 ```
 
-#### Test Sensor Data
-```dart
-// Test sensor data parsing
-final testData = "12.34,-5.67,8.90,123.45,-67.89,45.12";
-final sensorData = bleService.parseSensorData(testData);
-print('Parsed data: $sensorData');
-
-// Test shot detection
-final isShot = bleService.isShotDetected(sensorData);
-print('Shot detected: $isShot');
+### **Test 3: Connection Test**
+```
+1. Tap "Connect" next to Smart Bat device
+2. ESP32 should show: "Device Connected!"
+3. Flutter should navigate to dashboard
+4. Dashboard should show "Connected" status
 ```
 
-### Performance Testing
+## 🚨 **Common Issues & Solutions**
 
-#### Memory Usage
-```dart
-// Check memory usage
-import 'dart:developer' as developer;
+### **Issue: "No devices found"**
+**Solutions:**
+- ✅ Check ESP32 is advertising (Serial Monitor)
+- ✅ Enable location services on Android
+- ✅ Restart Bluetooth on phone
+- ✅ Move ESP32 closer to phone
+- ✅ Check device name is exactly "Smart Bat"
 
-void checkMemoryUsage() {
-  developer.Timeline.startSync('memory_check');
-  // Your code here
-  developer.Timeline.finishSync();
-}
+### **Issue: "I2C NACK errors"**
+**Solutions:**
+- ✅ Check wiring connections
+- ✅ Use shorter I2C wires
+- ✅ Ensure stable 3.3V power
+- ✅ Try different I2C pins (GPIO21/22)
+- ✅ Add pull-up resistors (4.7kΩ) to SDA/SCL
+
+### **Issue: "Connection fails"**
+**Solutions:**
+- ✅ Restart ESP32 after upload
+- ✅ Clear Flutter app cache
+- ✅ Check UUIDs match exactly
+- ✅ Ensure ESP32 has stable power
+
+## 📱 **Android-Specific Issues**
+
+### **MIUI/Xiaomi Issues:**
+- 🔧 **Developer Options**: Enable "Disable permission monitoring"
+- 📍 **Location**: Enable "High accuracy" mode
+- 🔒 **Permissions**: Grant all Bluetooth permissions manually
+- 🔄 **Restart**: Restart phone after permission changes
+
+### **General Android Issues:**
+- 📱 **Bluetooth**: Clear Bluetooth cache in Settings
+- 🔄 **Restart**: Restart Bluetooth service
+- 📍 **Location**: Ensure location is enabled for BLE scanning
+- 🔒 **Permissions**: Check app permissions in Settings
+
+## 🎯 **Expected Final Behavior**
+
+### **ESP32 Serial Monitor:**
+```
+--- Smart Bat BLE - Enhanced Debug Version ---
+Attempting to initialize BNO055 sensor...
+Sensor initialization attempt 1/5...
+✅ BNO055 Sensor Initialized Successfully!
+Initializing BLE...
+📡 BLE Advertising Started - Device Name: 'Smart Bat'
+🔍 Waiting for Flutter app connection...
+📡 Still advertising... Waiting for connection
+Device Connected!
+📤 Sending data: 2.15,-1.23,9.81,45.2,-12.8,67.3
 ```
 
-#### Performance Monitoring
-```dart
-// Monitor performance
-final monitor = PerformanceMonitor();
-
-monitor.startOperation('ble_connection');
-try {
-  await bleService.connectToDevice(device);
-} finally {
-  monitor.endOperation('ble_connection');
-}
-
-final metrics = monitor.getMetrics();
-print('BLE connection time: ${metrics['ble_connection']}');
+### **Flutter Console:**
+```
+🔍 Starting device scan...
+Starting scan for Smart Bat devices...
+Scan results count: 1
+Found device: Smart Bat (AA:BB:CC:DD:EE:FF)
+✅ Added Smart Bat device: Smart Bat
+Connecting to device: Smart Bat
+Successfully connected to Smart Bat
 ```
 
----
+## 🚀 **Next Steps**
 
-## 📞 Getting Help
+1. **Upload the enhanced Arduino code**
+2. **Test ESP32 advertising** (Serial Monitor)
+3. **Test Flutter discovery** (console logs)
+4. **Try connection** and report results
+5. **Check wiring** if I2C errors persist
 
-### Self-Help Resources
-
-1. **User Guide**: Check the comprehensive user guide
-2. **FAQ**: Review frequently asked questions
-3. **Video Tutorials**: Watch setup and usage videos
-4. **Community Forum**: Ask questions in user community
-5. **Knowledge Base**: Search our knowledge base
-
-### Contact Support
-
-#### Email Support
-- **General Support**: support@coacheseyeai.com
-- **Technical Issues**: tech@coacheseyeai.com
-- **Hardware Issues**: hardware@coacheseyeai.com
-- **Billing Questions**: billing@coacheseyeai.com
-
-#### Live Support
-- **In-App Chat**: Available in app settings
-- **Phone Support**: 1-800-COACH-AI
-- **Business Hours**: Monday-Friday, 9 AM - 6 PM EST
-
-#### Emergency Support
-- **Critical Issues**: emergency@coacheseyeai.com
-- **24/7 Hotline**: 1-800-EMERGENCY
-- **Response Time**: Within 2 hours
-
-### Reporting Issues
-
-#### Bug Reports
-When reporting bugs, include:
-1. **Device Information**: Model, OS version
-2. **App Version**: Current app version
-3. **Steps to Reproduce**: Detailed steps
-4. **Expected Behavior**: What should happen
-5. **Actual Behavior**: What actually happens
-6. **Screenshots**: If applicable
-7. **Log Files**: If available
-
-#### Feature Requests
-When requesting features, include:
-1. **Feature Description**: Detailed description
-2. **Use Case**: Why you need this feature
-3. **Priority**: How important it is
-4. **Alternatives**: Current workarounds
-5. **Impact**: How it would help you
-
----
-
-## 🔄 Maintenance & Updates
-
-### Regular Maintenance
-
-#### Weekly Tasks
-- **Check for updates**: App and firmware updates
-- **Clear cache**: Clear app cache
-- **Check storage**: Ensure sufficient storage
-- **Review settings**: Update preferences as needed
-
-#### Monthly Tasks
-- **Deep clean**: Clear all app data
-- **Update firmware**: Check for hardware updates
-- **Review performance**: Check app performance
-- **Backup data**: Ensure data is backed up
-
-#### Quarterly Tasks
-- **Full reset**: Complete app reset
-- **Hardware check**: Inspect Smart Bat hardware
-- **Performance review**: Analyze performance trends
-- **Feature review**: Check for new features
-
-### Update Procedures
-
-#### App Updates
-1. **Check for updates**: In app store
-2. **Read release notes**: Understand changes
-3. **Backup data**: Ensure data is safe
-4. **Install update**: Follow update process
-5. **Test functionality**: Verify everything works
-
-#### Firmware Updates
-1. **Check for updates**: In app settings
-2. **Follow instructions**: Read update guide
-3. **Ensure battery**: Keep Smart Bat charged
-4. **Update firmware**: Follow update process
-5. **Test hardware**: Verify sensors work
-
----
-
-## 📋 Troubleshooting Checklist
-
-### Before Contacting Support
-
-- [ ] **Restarted the app**
-- [ ] **Restarted the device**
-- [ ] **Checked internet connection**
-- [ ] **Checked Bluetooth settings**
-- [ ] **Checked app permissions**
-- [ ] **Checked storage space**
-- [ ] **Updated to latest app version**
-- [ ] **Checked Smart Bat battery**
-- [ ] **Tried hardware simulator mode**
-- [ ] **Read relevant documentation**
-
-### Information to Provide
-
-- [ ] **Device model and OS version**
-- [ ] **App version number**
-- [ ] **Smart Bat firmware version**
-- [ ] **Error messages (if any)**
-- [ ] **Steps to reproduce the issue**
-- [ ] **Screenshots or videos**
-- [ ] **Log files (if available)**
-- [ ] **Previous working state**
-- [ ] **Recent changes made**
-
----
-
-This troubleshooting guide should help you resolve most issues with the Smart Cricket Bat app. If you continue to experience problems, don't hesitate to contact our support team for assistance.
+The enhanced code should resolve both the I2C issues and the BLE discovery problems! 🏏
