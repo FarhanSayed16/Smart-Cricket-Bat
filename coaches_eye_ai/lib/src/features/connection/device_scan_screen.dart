@@ -71,9 +71,15 @@ class _DeviceScanScreenState extends ConsumerState<DeviceScanScreen> {
         _lastError = null;
       });
 
+      print('🔍 Starting device scan...');
       final bleService = ref.read(bleServiceProvider);
-      await bleService.scanForDevice(timeout: const Duration(seconds: 15));
+      await bleService.scanForDevice(timeout: const Duration(seconds: 20));
+
+      setState(() {
+        _isScanning = false;
+      });
     } catch (e) {
+      print('❌ Scan error: $e');
       _errorHandler.handleError(e, context: 'Device Scanning');
       setState(() {
         _isScanning = false;
