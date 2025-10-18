@@ -42,5 +42,7 @@ app.*.map.json
 # Android Studio will place build artifacts here
 ios/
 macos/
-
+arduinocode/
+android/
+app/src/
 
