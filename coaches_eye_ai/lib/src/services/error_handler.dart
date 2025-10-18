@@ -55,7 +55,10 @@ class ErrorHandler {
       case BLEErrorType.connection:
         return 'Connection failed. Please check if your Smart Bat is nearby and try again.';
       case BLEErrorType.permission:
-        return 'Bluetooth permission required. Please enable Bluetooth access in settings.';
+        if (error.message.contains('LOCATION')) {
+          return 'Location permission required for Bluetooth scanning. Please enable Location access in Settings > Apps > Coach\'s Eye AI > Permissions.';
+        }
+        return 'Bluetooth permission required. Please enable Bluetooth and Location access in settings.';
       case BLEErrorType.data:
         return 'Data transmission error. Please reconnect your Smart Bat.';
       case BLEErrorType.timeout:
