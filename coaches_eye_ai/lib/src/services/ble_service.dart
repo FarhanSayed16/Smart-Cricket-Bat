@@ -42,10 +42,8 @@ class BLEService {
   static const int _maxReconnectAttempts = 3;
   static const Duration _baseReconnectDelay = Duration(seconds: 2);
   static const Duration _connectionTimeout = Duration(seconds: 30);
-  static const Duration _scanTimeout = Duration(seconds: 10);
 
   // Data transmission constants
-  static const int _maxDataRate = 20; // 20Hz max
   static const int _bufferSize = 1024;
   static const Duration _dataRateWindow = Duration(milliseconds: 50);
 
@@ -101,41 +99,53 @@ class BLEService {
   /// Initialize BLE service and check permissions
   Future<bool> initialize() async {
     try {
-      // Check Bluetooth permissions
-      final bluetoothPermission = await Permission.bluetoothScan.request();
-      final bluetoothConnectPermission = await Permission.bluetoothConnect
-          .request();
-
-      if (!bluetoothPermission.isGranted ||
-          !bluetoothConnectPermission.isGranted) {
-        print('Bluetooth permissions not granted');
-        return false;
+      // FIX: Await the first value from the adapter state stream to get the actual state.
+      if (await FlutterBluePlus.adapterState.first !=
+          BluetoothAdapterState.on) {
+        print('Bluetooth adapter is not on.');
+        throw BLEException(
+          'Bluetooth adapter is not turned on.',
+          BLEErrorType.permission,
+        );
       }
 
-      // Check if Bluetooth is available
-      final adapterState = FlutterBluePlus.adapterState;
-      if (adapterState != BluetoothAdapterState.on) {
-        print('Bluetooth adapter is not on: $adapterState');
-        return false;
+      // Request all necessary permissions at once.
+      final permissions = await [
+        Permission.bluetoothScan,
+        Permission.bluetoothConnect,
+        Permission.location, // Add location permission for BLE scanning
+        Permission.locationWhenInUse, // Add location when in use permission
+      ].request();
+
+      // Check if all permissions are granted
+      final allGranted = permissions.values.every((status) => status.isGranted);
+      if (!allGranted) {
+        print('Not all permissions granted: $permissions');
+        throw BLEException(
+          'Required permissions not granted. Please enable Bluetooth and Location permissions.',
+          BLEErrorType.permission,
+        );
       }
 
-      // Listen to adapter state changes
+      // Listen to adapter state changes for handling disconnections.
       _adapterStateSubscription = FlutterBluePlus.adapterState.listen((state) {
         if (state != BluetoothAdapterState.on && isConnected) {
           _handleDisconnection();
         }
       });
 
+      print('BLE Service Initialized Successfully.');
       return true;
     } catch (e) {
       print('Error initializing BLE service: $e');
-      return false;
+      // Re-throw the exception so the UI can catch it and display an error.
+      rethrow;
     }
   }
 
   /// Scan for Smart Bat devices
   Future<void> scanForDevice({
-    Duration timeout = const Duration(seconds: 10),
+    Duration timeout = const Duration(seconds: 15),
   }) async {
     try {
       if (!await initialize()) {
@@ -144,19 +154,34 @@ class BLEService {
 
       print('Starting scan for Smart Bat devices...');
 
-      // Start scanning
+      // Start scanning with more aggressive settings
       await FlutterBluePlus.startScan(
         timeout: timeout,
         withServices: [Guid(SERVICE_UUID)],
+        androidScanMode: AndroidScanMode.lowLatency,
+        androidUsesFineLocation: true,
       );
 
-      // Listen to scan results
+      // Listen to scan results with better filtering
       FlutterBluePlus.scanResults.listen((results) {
-        final devices = results
-            .where((result) => result.device.platformName.isNotEmpty)
-            .map((result) => result.device)
-            .where((device) => device.platformName.contains(DEVICE_NAME))
-            .toList();
+        print('Scan results count: ${results.length}');
+
+        final devices = <BluetoothDevice>[];
+
+        for (final result in results) {
+          final device = result.device;
+          final deviceName = device.platformName;
+
+          print('Found device: $deviceName (${device.remoteId})');
+
+          // Check if device name contains "Smart Bat" or matches exactly
+          if (deviceName.isNotEmpty &&
+              (deviceName.toLowerCase().contains('smart bat') ||
+                  deviceName.toLowerCase().contains('smartbat'))) {
+            devices.add(device);
+            print('✅ Added Smart Bat device: $deviceName');
+          }
+        }
 
         _scanController.add(devices);
       });
@@ -378,7 +403,6 @@ class BLEService {
 
         // Validate sensor values
         if (!_validateSensorValues(accX, accY, accZ, gyroX, gyroY, gyroZ)) {
-          print('Invalid sensor values: $values');
           return;
         }
 
@@ -415,6 +439,12 @@ class BLEService {
 
   /// Validate sensor data format
   bool _validateSensorData(String data) {
+    // Check for error messages from ESP32
+    if (data.contains('ERROR,SENSOR_NOT_FOUND')) {
+      print('ESP32 reports sensor not found - check wiring');
+      return false;
+    }
+
     // Basic validation: should be 6 comma-separated numbers
     final parts = data.split(',');
     if (parts.length != 6) return false;
