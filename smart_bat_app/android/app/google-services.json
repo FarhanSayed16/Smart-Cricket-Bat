@@ -12,7 +12,20 @@
           "package_name": "com.example.smart_bat_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "419313572643-1234567890abcdef.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smart_bat_app",
+            "certificate_hash": "35:E4:40:D1:3D:63:14:E0:93:C2:29:A1:44:91:AF:55:4E:76:1B:5F"
+          }
+        },
+        {
+          "client_id": "419313572643-abcdef1234567890.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBPWEr4uWDULN8rb10n_UvN_aLN4UieSog"
