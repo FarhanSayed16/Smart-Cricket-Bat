@@ -1,0 +1,24 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Users can read/write to their own 'uploads' folder
+    match /uploads/{userId}/{allPaths=**} {
+      allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Users can read/write to their own 'videos' folder
+    match /videos/{userId}/{allPaths=**} {
+      allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Users can read/write to their own 'exports' folder
+    match /exports/{userId}/{allPaths=**} {
+      allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Coaches can read their players' data
+    match /coach_data/{coachId}/{allPaths=**} {
+      allow read, write, create, delete: if request.auth != null && request.auth.uid == coachId;
+    }
+  }
+}
