@@ -1,43 +1,39 @@
 {
   "project_info": {
-    "project_number": "419313572643",
+    "project_number": "YOUR_PROJECT_NUMBER",
     "project_id": "coaches-eye-ai",
-    "storage_bucket": "coaches-eye-ai.firebasestorage.app"
+    "storage_bucket": "coaches-eye-ai.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:419313572643:android:bb1a047e17f1f40ca7ca96",
+        "mobilesdk_app_id": "YOUR_MOBILE_SDK_APP_ID",
         "android_client_info": {
           "package_name": "com.example.smart_bat_app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "419313572643-1234567890abcdef.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.smart_bat_app",
-            "certificate_hash": "35:E4:40:D1:3D:63:14:E0:93:C2:29:A1:44:91:AF:55:4E:76:1B:5F"
-          }
-        },
-        {
-          "client_id": "419313572643-abcdef1234567890.apps.googleusercontent.com",
+          "client_id": "YOUR_OAUTH_CLIENT_ID",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBPWEr4uWDULN8rb10n_UvN_aLN4UieSog"
+          "current_key": "YOUR_API_KEY"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "YOUR_OAUTH_CLIENT_ID",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
   ],
   "configuration_version": "1"
 }
-
