@@ -39,11 +39,17 @@ dependencies:
   camera: ^0.10.6 # Camera functionality
   video_player: ^2.8.2 # Video playback
   firebase_storage: ^11.6.0 # Firebase Storage for video uploads
+  firebase_messaging: ^14.7.10 # Firebase Cloud Messaging for push notifications
   google_mlkit_pose_detection: ^0.14.0 # AI pose estimation
+  google_sign_in: ^6.2.1 # Google Sign-In
+  image: ^4.1.7 # Image processing for optimization
+  path_provider: ^2.1.4 # File system paths
+  shared_preferences: ^2.3.2 # Local storage
+  csv: ^6.0.0 # CSV export functionality
+  fl_chart: ^0.68.0 # Charts and graphs for analytics
+  cupertino_icons: ^1.0.8
 
   # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
