@@ -1,0 +1,17 @@
+{
+  "@@locale": "mr",
+  "appTitle": "KnoQ",
+  "homeTab": "होम",
+  "analyticsTab": "विश्लेषण",
+  "settingsTab": "सेटिंग्ज",
+  "recentSessions": "अलीकडील सत्रे",
+  "activeDrills": "सक्रिय सराव",
+  "totalHits": "एकूण हिट्स",
+  "avgPower": "सरासरी ताकद",
+  "sweetSpot": "स्वीट स्पॉट",
+  "language": "भाषा",
+  "exportData": "माझा डेटा निर्यात करा",
+  "exportSuccess": "डेटा यशस्वीरित्या निर्यात झाला",
+  "exportError": "डेटा निर्यात करण्यात अयशस्वी",
+  "noData": "कोणताही डेटा उपलब्ध नाही"
+}

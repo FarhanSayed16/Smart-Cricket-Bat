@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "appTitle": "KnoQ",
+  "homeTab": "Home",
+  "analyticsTab": "Analytics",
+  "settingsTab": "Settings",
+  "recentSessions": "Recent Sessions",
+  "activeDrills": "Active Drills",
+  "totalHits": "Total Hits",
+  "avgPower": "Avg Power",
+  "sweetSpot": "Sweet Spot",
+  "language": "Language",
+  "exportData": "Export My Data",
+  "exportSuccess": "Data exported successfully",
+  "exportError": "Failed to export data",
+  "noData": "No data available"
+}

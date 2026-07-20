@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "899357453453",
+    "project_id": "knoq-dev",
+    "storage_bucket": "knoq-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899357453453:android:452af9fdbae06ad92c86c4",
+        "android_client_info": {
+          "package_name": "com.knoq.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3fwMDCMOuPao762e55jpDYYyHhgdmBto"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
