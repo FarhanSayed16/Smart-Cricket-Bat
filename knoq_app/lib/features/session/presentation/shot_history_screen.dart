@@ -77,7 +77,7 @@ class _ShotHistoryScreenState extends ConsumerState<ShotHistoryScreen> {
   Widget _buildSessionHeader(BuildContext context, ThemeData theme, SessionModel session) {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [

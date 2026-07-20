@@ -68,10 +68,10 @@ class SessionStats {
     double zoneEntropyScore = (entropy / 2.3219) * 50;
 
     // 2. Power Standard Deviation Calculation
-    double _meanPower = avgPower.toDouble();
+    double meanPower = avgPower.toDouble();
     double sumOfSquaredDiffs = 0;
     for (int p in _powers) {
-      sumOfSquaredDiffs += pow(p - _meanPower, 2);
+      sumOfSquaredDiffs += pow(p - meanPower, 2);
     }
     double variance = sumOfSquaredDiffs / _powers.length;
     double stdDev = sqrt(variance);

@@ -186,21 +186,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           ),
           const SizedBox(height: 24),
           Text('Batting Hand', style: theme.textTheme.bodyLarge),
-          Row(
-            children: [
-              Expanded(
-                child: RadioListTile<String>(
-                  title: const Text('Right'), value: 'Right', groupValue: _battingHand,
-                  onChanged: (v) => setState(() => _battingHand = v!),
-                )
-              ),
-              Expanded(
-                child: RadioListTile<String>(
-                  title: const Text('Left'), value: 'Left', groupValue: _battingHand,
-                  onChanged: (v) => setState(() => _battingHand = v!),
-                )
-              ),
+          SegmentedButton<String>(
+            segments: const [
+              ButtonSegment(value: 'Right', label: Text('Right')),
+              ButtonSegment(value: 'Left', label: Text('Left')),
             ],
+            selected: {_battingHand},
+            onSelectionChanged: (val) => setState(() => _battingHand = val.first),
           )
         ],
       ),

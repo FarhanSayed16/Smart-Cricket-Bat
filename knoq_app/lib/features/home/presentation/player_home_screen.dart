@@ -147,8 +147,8 @@ class _PlayerHomeScreenState extends ConsumerState<PlayerHomeScreen> {
             Text("Hey, ${user?.name ?? 'Player'}!", style: theme.textTheme.titleMedium),
           ],
         ),
-        actions: [
-          const SyncIndicator(),
+        actions: const [
+          SyncIndicator(),
         ],
       ),
       body: SingleChildScrollView(
@@ -324,7 +324,7 @@ class _PlayerHomeScreenState extends ConsumerState<PlayerHomeScreen> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: isCompleted
-                          ? Colors.green.withOpacity(0.15)
+                          ? Colors.green.withValues(alpha: 0.15)
                           : theme.colorScheme.primaryContainer,
                       borderRadius: BorderRadius.circular(16),
                       border: isCompleted ? Border.all(color: Colors.green, width: 2) : null,

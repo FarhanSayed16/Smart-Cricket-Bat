@@ -56,9 +56,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.of(ctx).pop();
               try {
                 await ref.read(authRepositoryProvider).deleteAccount(passwordController.text);
-                if (context.mounted) context.go('/login');
+                if (mounted) context.go('/login');
               } catch (e) {
-                if (context.mounted) {
+                if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Failed to delete: $e')),
                   );
@@ -100,14 +100,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.of(ctx).pop();
               try {
                 await ref.read(userRepositoryProvider).joinAcademy(code);
-                if (context.mounted) {
+                if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Successfully joined academy!')),
                   );
                 }
                 ref.invalidate(currentUserProvider); // Refresh UI to show academy info
               } catch (e) {
-                if (context.mounted) {
+                if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(e.toString())),
                   );
@@ -138,14 +138,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.of(ctx).pop();
               try {
                 await ref.read(userRepositoryProvider).leaveAcademy();
-                if (context.mounted) {
+                if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Left academy successfully.')),
                   );
                 }
                 ref.invalidate(currentUserProvider); // Refresh UI
               } catch (e) {
-                if (context.mounted) {
+                if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(e.toString())),
                   );

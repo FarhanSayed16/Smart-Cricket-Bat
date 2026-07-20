@@ -321,8 +321,8 @@ export default function SuperAdmin() {
                 <div className="border rounded-lg p-4 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-semibold">Virat Kohli</p>
-                      <p className="text-sm text-muted-foreground">virat@example.com</p>
+                      <p className="font-semibold">Rahul Deshmukh</p>
+                      <p className="text-sm text-muted-foreground">rahul@example.com</p>
                     </div>
                     <Badge>Player</Badge>
                   </div>

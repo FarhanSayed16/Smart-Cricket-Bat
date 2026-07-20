@@ -18,7 +18,7 @@ interface Clip {
 
 const mockClips: Clip[] = Array.from({ length: 12 }).map((_, i) => ({
   id: `clip_${i + 1}`,
-  playerName: i % 3 === 0 ? "Virat Kohli" : i % 2 === 0 ? "Shubman Gill" : "Rohit Sharma",
+  playerName: i % 3 === 0 ? "Rahul Deshmukh" : i % 2 === 0 ? "Aditya Sharma" : "Karan Singh",
   date: "Oct 24, 2023",
   power: Math.floor(Math.random() * 50) + 40,
   zone: ["Sweet Spot", "Middle", "Toe", "Edge"][Math.floor(Math.random() * 4)],

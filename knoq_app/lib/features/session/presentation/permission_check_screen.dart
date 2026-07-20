@@ -31,7 +31,7 @@ class _PermissionCheckScreenState extends State<PermissionCheckScreen> {
       if (allGranted && mounted) {
         // Automatically check if Bluetooth adapter is strictly ON
         final state = await FlutterBluePlus.adapterState.first;
-        if (state == BluetoothAdapterState.on) {
+        if (state == BluetoothAdapterState.on && mounted) {
           context.go('/ble-scan');
         } else {
              // Let user turn it on

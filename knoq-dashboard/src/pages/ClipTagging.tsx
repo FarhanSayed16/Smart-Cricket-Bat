@@ -76,7 +76,7 @@ export default function ClipTagging() {
             </Button>
           </Link>
           <h1 className="text-xl font-bold tracking-tight">Tagging Clip: {clipId}</h1>
-          <span className="text-sm text-muted-foreground">Player: Virat Kohli | Oct 24, 2023</span>
+          <span className="text-sm text-muted-foreground">Player: Rahul Deshmukh | Oct 24, 2023</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground mr-4">Progress: 47 / 100 tagged today</span>

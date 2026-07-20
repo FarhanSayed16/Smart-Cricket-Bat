@@ -12,7 +12,7 @@ void main() {
     stats = SessionStats();
   });
 
-  ShotData _makeShot({required int index, String zone = 'Sweet', int power = 50, double? swing}) {
+  ShotData makeShot({required int index, String zone = 'Sweet', int power = 50, double? swing}) {
     return ShotData(
       hit: index,
       power: power,
@@ -26,7 +26,7 @@ void main() {
 
   void addShots(int count, {String zone = 'Sweet', int power = 50, double? swing}) {
     for (int i = 0; i < count; i++) {
-      stats.addShot(_makeShot(index: stats.totalHits + 1, zone: zone, power: power, swing: swing));
+      stats.addShot(makeShot(index: stats.totalHits + 1, zone: zone, power: power, swing: swing));
     }
   }
 
@@ -37,13 +37,13 @@ void main() {
 
     test('< 5 shots -> empty list', () {
       addShots(4);
-      final shots = List<ShotData>.generate(4, (i) => _makeShot(index: i + 1));
+      final shots = List<ShotData>.generate(4, (i) => makeShot(index: i + 1));
       expect(engine.generateInsights(stats, shots).isEmpty, true);
     });
 
     test('all sweet (>70%) -> positive insight', () {
       addShots(10, zone: 'Sweet', power: 50);
-      final shots = List<ShotData>.generate(10, (i) => _makeShot(index: i + 1, zone: 'Sweet', power: 50));
+      final shots = List<ShotData>.generate(10, (i) => makeShot(index: i + 1, zone: 'Sweet', power: 50));
 
       final insights = engine.generateInsights(stats, shots);
       expect(insights.length, 1);
@@ -54,7 +54,7 @@ void main() {
     test('heavy left bias -> left zone insight', () {
       addShots(5, zone: 'Left', power: 50); // 50% left
       addShots(5, zone: 'Sweet', power: 50);
-      final shots = List<ShotData>.generate(10, (i) => _makeShot(
+      final shots = List<ShotData>.generate(10, (i) => makeShot(
         index: i + 1, power: 50, zone: i < 5 ? 'Left' : 'Sweet'));
 
       final insights = engine.generateInsights(stats, shots);
@@ -70,7 +70,7 @@ void main() {
       // last quarter avg power = 50 (< 80 * 0.8 = 64)
       addShots(14, zone: 'Sweet', power: 50);
 
-      final shots = List<ShotData>.generate(56, (i) => _makeShot(
+      final shots = List<ShotData>.generate(56, (i) => makeShot(
         index: i + 1, power: i < 14 ? 80 : (i < 42 ? 60 : 50), zone: 'Sweet'));
 
       final insights = engine.generateInsights(stats, shots);
@@ -82,7 +82,7 @@ void main() {
     test('exactly 40% left -> no trigger (must be >40%)', () {
       addShots(4, zone: 'Left', power: 50); // 40%
       addShots(6, zone: 'Sweet', power: 50);
-      final shots = List<ShotData>.generate(10, (i) => _makeShot(
+      final shots = List<ShotData>.generate(10, (i) => makeShot(
         index: i + 1, power: 50, zone: i < 4 ? 'Left' : 'Sweet'));
 
       final insights = engine.generateInsights(stats, shots);
@@ -91,7 +91,7 @@ void main() {
 
     test('all shots have swing=null -> NO swing insights generated', () {
       addShots(10, zone: 'Sweet', power: 50, swing: null);
-      final shots = List<ShotData>.generate(10, (i) => _makeShot(index: i + 1, power: 50, zone: 'Sweet'));
+      final shots = List<ShotData>.generate(10, (i) => makeShot(index: i + 1, power: 50, zone: 'Sweet'));
 
       final insights = engine.generateInsights(stats, shots);
       expect(insights.any((e) => e.type == 'Swing'), false);
@@ -102,7 +102,7 @@ void main() {
       addShots(3, zone: 'Sweet', power: 50, swing: 150); // High stddev
       addShots(4, zone: 'Sweet', power: 50, swing: null);
 
-      final shots = List<ShotData>.generate(10, (i) => _makeShot(
+      final shots = List<ShotData>.generate(10, (i) => makeShot(
         index: i + 1, power: 50, zone: 'Sweet',
         swing: i < 3 ? 10.0 : (i < 6 ? 150.0 : null)));
 
@@ -114,7 +114,7 @@ void main() {
       addShots(3, zone: 'Sweet', power: 50, swing: 100);
       addShots(7, zone: 'Sweet', power: 50, swing: null);
 
-      final shots = List<ShotData>.generate(10, (i) => _makeShot(
+      final shots = List<ShotData>.generate(10, (i) => makeShot(
         index: i + 1, power: 50, zone: 'Sweet',
         swing: i < 3 ? 100.0 : null));
 
@@ -127,7 +127,7 @@ void main() {
       addShots(5, zone: 'Left', power: 30);
       addShots(5, zone: 'Right', power: 80);
 
-      final shots = List<ShotData>.generate(10, (i) => _makeShot(
+      final shots = List<ShotData>.generate(10, (i) => makeShot(
         index: i + 1, power: i < 5 ? 30 : 80,
         zone: i < 5 ? 'Left' : 'Right'));
 

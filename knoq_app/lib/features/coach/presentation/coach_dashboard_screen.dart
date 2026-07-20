@@ -388,7 +388,7 @@ class _CoachDashboardScreenState extends ConsumerState<CoachDashboardScreen> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: role,
+                initialValue: role,
                 decoration: const InputDecoration(
                   labelText: 'Role',
                   border: OutlineInputBorder(),

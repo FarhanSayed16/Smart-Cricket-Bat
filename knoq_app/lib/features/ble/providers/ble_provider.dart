@@ -112,7 +112,7 @@ class BleNotifier extends StateNotifier<BleState> {
     state = state.copyWith(phase: BleConnectionPhase.reconnecting, errorMessage: null);
 
     for (int i = 0; i < BleConstants.maxReconnectAttempts; i++) {
-      await Future.delayed(Duration(seconds: BleConstants.reconnectDelaySeconds));
+      await Future.delayed(const Duration(seconds: BleConstants.reconnectDelaySeconds));
       
       try {
         if (state.connectedDevice != null) {

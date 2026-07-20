@@ -144,7 +144,7 @@ class AnalyticsRepository {
        String dateKey = formatter.format(s.startTime);
        // basic deduplication if multiple sessions on same day for simplicity offline:
        if (powerTrend.containsKey(dateKey)) {
-          dateKey = '${dateKey} (2)';
+          dateKey = '$dateKey (2)';
        }
 
        powerTrend[dateKey] = s.avgPower.toDouble();

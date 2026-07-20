@@ -11,7 +11,7 @@ void main() {
             body: EmptyState(
               title: 'No Data',
               subtitle: 'There is no data to display.',
-              illustration: const Icon(Icons.inbox),
+              illustration: Icon(Icons.inbox),
             ),
           ),
         ),

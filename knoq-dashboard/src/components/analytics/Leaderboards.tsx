@@ -8,9 +8,9 @@ const leaderboards = [
     color: "text-blue-500",
     bg: "bg-blue-500/10",
     players: [
-      { name: "Yashasvi Jaiswal", metric: "+15% Sweet Spot", value: "+15%" },
-      { name: "Shubman Gill", metric: "+12% Sweet Spot", value: "+12%" },
-      { name: "Rishabh Pant", metric: "+8% Power", value: "+8%" },
+      { name: "Vikram Desai", metric: "+15% Sweet Spot", value: "+15%" },
+      { name: "Aditya Sharma", metric: "+12% Sweet Spot", value: "+12%" },
+      { name: "Sanjay Verma", metric: "+8% Power", value: "+8%" },
     ],
   },
   {
@@ -19,9 +19,9 @@ const leaderboards = [
     color: "text-purple-500",
     bg: "bg-purple-500/10",
     players: [
-      { name: "Virat Kohli", metric: "92/100 Consistency Score", value: "92" },
-      { name: "Cheteshwar Pujara", metric: "89/100 Consistency Score", value: "89" },
-      { name: "KL Rahul", metric: "85/100 Consistency Score", value: "85" },
+      { name: "Rahul Deshmukh", metric: "92/100 Consistency Score", value: "92" },
+      { name: "Alok Nath", metric: "89/100 Consistency Score", value: "89" },
+      { name: "Rohan Joshi", metric: "85/100 Consistency Score", value: "85" },
     ],
   },
   {
@@ -30,9 +30,9 @@ const leaderboards = [
     color: "text-green-500",
     bg: "bg-green-500/10",
     players: [
-      { name: "Rohit Sharma", metric: "24 Sessions", value: "24" },
-      { name: "Shubman Gill", metric: "21 Sessions", value: "21" },
-      { name: "Ishan Kishan", metric: "19 Sessions", value: "19" },
+      { name: "Karan Singh", metric: "24 Sessions", value: "24" },
+      { name: "Aditya Sharma", metric: "21 Sessions", value: "21" },
+      { name: "Deepak Iyer", metric: "19 Sessions", value: "19" },
     ],
   },
   {
@@ -41,9 +41,9 @@ const leaderboards = [
     color: "text-yellow-500",
     bg: "bg-yellow-500/10",
     players: [
-      { name: "Virat Kohli", metric: "68% Average", value: "68%" },
-      { name: "Suryakumar Yadav", metric: "65% Average", value: "65%" },
-      { name: "Hardik Pandya", metric: "61% Average", value: "61%" },
+      { name: "Rahul Deshmukh", metric: "68% Average", value: "68%" },
+      { name: "Gaurav Nair", metric: "65% Average", value: "65%" },
+      { name: "Sameer Kadam", metric: "61% Average", value: "61%" },
     ],
   },
 ]

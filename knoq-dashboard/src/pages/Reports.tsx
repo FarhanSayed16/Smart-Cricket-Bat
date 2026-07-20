@@ -75,9 +75,9 @@ export default function Reports() {
                     <SelectValue placeholder="Search players..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="p1">Virat Kohli</SelectItem>
-                    <SelectItem value="p2">Rohit Sharma</SelectItem>
-                    <SelectItem value="p3">Shubman Gill</SelectItem>
+                    <SelectItem value="p1">Rahul Deshmukh</SelectItem>
+                    <SelectItem value="p2">Karan Singh</SelectItem>
+                    <SelectItem value="p3">Aditya Sharma</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -103,7 +103,7 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
     if (shouldEnd == true && mounted) {
        await _stopRecording();
        await ref.read(liveSessionProvider.notifier).endSession();
-       context.go('/session-summary');
+       if (mounted) context.go('/session-summary');
     }
   }
 
@@ -156,7 +156,7 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                 Container(
                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                    width: double.infinity,
-                   color: bleState.isReconnecting ? Colors.orange.withOpacity(0.2) : Colors.red.withOpacity(0.15),
+                   color: bleState.isReconnecting ? Colors.orange.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.15),
                    child: Text(
                      bleState.isReconnecting 
                        ? 'Reconnecting to Bat...'
@@ -173,7 +173,7 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
              Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: theme.colorScheme.outline.withOpacity(0.2))),
+                  border: Border(bottom: BorderSide(color: theme.colorScheme.outline.withValues(alpha: 0.2))),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -201,14 +201,14 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                      
                    // Recording indicator
                    if (_isRecording)
-                     Positioned(
+                     const Positioned(
                        top: 8,
                        right: 16,
                        child: Row(
                          children: [
                            Icon(Icons.circle, color: Colors.red, size: 12),
-                           const SizedBox(width: 4),
-                           const Text('REC', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                           SizedBox(width: 4),
+                           Text('REC', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                          ],
                        ),
                      ),
@@ -237,7 +237,7 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                flex: 2,
                child: Container(
                  decoration: BoxDecoration(
-                   color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+                   color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                  ),
                  child: sessionState.shots.isEmpty

@@ -137,9 +137,9 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
     final latestConsistency = data.consistencyTrend.values.last;
     
     Color gaugeColor;
-    if (latestConsistency >= 70) gaugeColor = Colors.green;
-    else if (latestConsistency >= 40) gaugeColor = Colors.orange;
-    else gaugeColor = Colors.red;
+    if (latestConsistency >= 70) { gaugeColor = Colors.green; }
+    else if (latestConsistency >= 40) { gaugeColor = Colors.orange; }
+    else { gaugeColor = Colors.red; }
 
     return Card(
       elevation: 2,
@@ -330,7 +330,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                       dotData: const FlDotData(show: true),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: theme.colorScheme.primary.withOpacity(0.1),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
                       ),
                     ),
                   ],
@@ -410,7 +410,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                           dotData: const FlDotData(show: false),
                           belowBarData: BarAreaData(
                             show: true,
-                            color: Colors.redAccent.withOpacity(0.1),
+                            color: Colors.redAccent.withValues(alpha: 0.1),
                           ),
                         ),
                       ],
@@ -450,7 +450,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(color: color.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(12)),
               child: Text(zone, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
             )
           ],
@@ -500,9 +500,9 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -599,7 +599,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
 
         return Card(
           elevation: 0,
-          color: theme.colorScheme.primaryContainer.withOpacity(0.3),
+          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -622,7 +622,7 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.15),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -657,9 +657,9 @@ class AnalyticsDashboardScreen extends ConsumerWidget {
              children: List.generate(4, (i) => Card(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
            ),
            const SizedBox(height: 24),
-           Card(child: const SizedBox(height: 250), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+           Card(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), child: const SizedBox(height: 250)),
            const SizedBox(height: 24),
-           Card(child: const SizedBox(height: 250), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+           Card(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), child: const SizedBox(height: 250)),
         ],
       )
     );

@@ -77,7 +77,7 @@ export default function SessionReplay() {
   const currentShot = mockShots[currentShotIndex]
 
   const sessionMeta = {
-    playerName: "Virat Kohli",
+    playerName: "Rahul Deshmukh",
     date: "April 29, 2026 — 3:00 PM",
     duration: "42 min",
     totalHits: mockShots.length,

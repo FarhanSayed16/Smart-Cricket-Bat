@@ -84,7 +84,7 @@ class _SessionSummaryScreenState extends ConsumerState<SessionSummaryScreen> {
       final imagePath = await File('${directory.path}/knoq_session.png').create();
       await imagePath.writeAsBytes(image);
 
-      final text = 'Check out my latest KnoQ session stats!';
+      const text = 'Check out my latest KnoQ session stats!';
       await Share.shareXFiles([XFile(imagePath.path)], text: text);
     } catch (e) {
       debugPrint("Error capturing screenshot: $e");
@@ -112,7 +112,7 @@ class _SessionSummaryScreenState extends ConsumerState<SessionSummaryScreen> {
           buttonText: 'Return Home',
           onButtonPress: () async {
             await ref.read(localSessionStoreProvider).clearSession();
-            if (mounted) context.go('/home');
+            if (context.mounted) context.go('/home');
           },
         ),
       );
@@ -282,7 +282,7 @@ class _SessionSummaryScreenState extends ConsumerState<SessionSummaryScreen> {
                  );
                  if (confirmed == true) {
                    await ref.read(localSessionStoreProvider).clearSession();
-                   if (mounted) context.go('/home');
+                   if (context.mounted) context.go('/home');
                  }
                },
             )

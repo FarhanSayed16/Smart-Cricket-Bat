@@ -98,9 +98,9 @@ async function seedVisitor() {
         // 5. Seed some dummy players for this academy
         console.log('Seeding dummy players...');
         const dummyPlayers = [
-            { email: 'player1_demo@knoq.in', name: 'Virat Singh', role: 'player' },
-            { email: 'player2_demo@knoq.in', name: 'Rohit Sharma', role: 'player' },
-            { email: 'player3_demo@knoq.in', name: 'MS Dhoni', role: 'player' }
+            { email: 'player1_demo@knoq.in', name: 'Rahul Deshmukh', role: 'player' },
+            { email: 'player2_demo@knoq.in', name: 'Karan Singh', role: 'player' },
+            { email: 'player3_demo@knoq.in', name: 'Arjun Patel', role: 'player' }
         ];
 
         for (const dp of dummyPlayers) {

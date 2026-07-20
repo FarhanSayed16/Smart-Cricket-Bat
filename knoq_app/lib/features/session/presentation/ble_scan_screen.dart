@@ -45,7 +45,7 @@ class _BleScanScreenState extends ConsumerState<BleScanScreen> with SingleTicker
         title: const Text('Connect Bat'),
         leading: BackButton(onPressed: () async {
             await ref.read(bleProvider.notifier).stopScan();
-            if (mounted) Navigator.pop(context);
+            if (context.mounted) Navigator.pop(context);
         }),
       ),
       body: SafeArea(
@@ -69,7 +69,7 @@ class _BleScanScreenState extends ConsumerState<BleScanScreen> with SingleTicker
                                   width: 80, height: 80,
                                   decoration: BoxDecoration(
                                      shape: BoxShape.circle,
-                                     color: theme.colorScheme.primary.withOpacity(0.3)
+                                     color: theme.colorScheme.primary.withValues(alpha: 0.3)
                                   ),
                                )
                             )
