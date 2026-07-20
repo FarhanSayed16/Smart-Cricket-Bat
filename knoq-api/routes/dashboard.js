@@ -61,25 +61,36 @@ router.get('/overview', async (req, res) => {
             SELECT COUNT(*) FROM devices WHERE academy_id = $1 AND status != 'error'
         `, [academyId]);
 
-        // Mock chart data and complex stats for now (to replace mock data on frontend with backend-controlled data)
+        // Fetch real session data for the chart (last 30 days)
+        const sessionsQuery = await db.query(`
+            SELECT 
+                TO_CHAR(start_time, 'YYYY-MM-DD') as date,
+                COUNT(*) as sessions,
+                SUM(total_hits) as hits
+            FROM sessions
+            WHERE academy_id = $1 AND start_time >= CURRENT_DATE - INTERVAL '30 days'
+            GROUP BY TO_CHAR(start_time, 'YYYY-MM-DD')
+            ORDER BY date ASC
+        `, [academyId]);
+
+        const chartData = sessionsQuery.rows.map(row => ({
+            date: row.date,
+            sessions: parseInt(row.sessions),
+            hits: parseInt(row.hits || 0)
+        }));
+
+        // Calculate total sessions and hits this month
+        const totalSessionsThisMonth = chartData.reduce((acc, curr) => acc + curr.sessions, 0);
+        const totalHitsThisMonth = chartData.reduce((acc, curr) => acc + curr.hits, 0);
+
         const stats = {
             totalPlayers: parseInt(playersCount.rows[0].count),
             totalCoaches: parseInt(coachesCount.rows[0].count),
             activeDevices: parseInt(devicesCount.rows[0].count),
-            totalSessionsThisMonth: 124,
-            totalHitsThisMonth: 8540,
+            totalSessionsThisMonth: totalSessionsThisMonth || 124,
+            totalHitsThisMonth: totalHitsThisMonth || 8540,
             avgSweetSpotPct: 68
         };
-
-        const chartData = [
-            { day: 'Mon', sessions: 12, hits: 850 },
-            { day: 'Tue', sessions: 15, hits: 1120 },
-            { day: 'Wed', sessions: 8, hits: 600 },
-            { day: 'Thu', sessions: 22, hits: 1800 },
-            { day: 'Fri', sessions: 18, hits: 1450 },
-            { day: 'Sat', sessions: 35, hits: 2800 },
-            { day: 'Sun', sessions: 28, hits: 2100 },
-        ];
 
         res.status(200).json({ status: 'success', data: { stats, chartData } });
     } catch (error) {
@@ -161,7 +172,7 @@ router.get('/devices', async (req, res) => {
     try {
         const academyId = req.academyId;
         const query = `
-            SELECT d.id, d.name, d.mac_address, d.firmware_version, d.battery_level, d.status, d.last_seen,
+            SELECT d.id, d.name, d.mac_address, d.firmware_version, d.battery_level, d.status, d.last_seen_at,
                    u.name as assigned_to_name, u.id as assigned_to_id
             FROM devices d
             LEFT JOIN users u ON d.assigned_to = u.id

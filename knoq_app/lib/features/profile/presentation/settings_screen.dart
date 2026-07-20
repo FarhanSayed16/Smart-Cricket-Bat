@@ -8,8 +8,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:knoq_app/l10n/app_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:knoq_app/core/network/api_client.dart';
-
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
@@ -58,9 +56,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.of(ctx).pop();
               try {
                 await ref.read(authRepositoryProvider).deleteAccount(passwordController.text);
-                if (mounted) context.go('/login');
+                if (context.mounted) context.go('/login');
               } catch (e) {
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Failed to delete: $e')),
                   );
@@ -102,14 +100,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.of(ctx).pop();
               try {
                 await ref.read(userRepositoryProvider).joinAcademy(code);
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Successfully joined academy!')),
                   );
                 }
                 ref.invalidate(currentUserProvider); // Refresh UI to show academy info
               } catch (e) {
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(e.toString())),
                   );
@@ -140,14 +138,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.of(ctx).pop();
               try {
                 await ref.read(userRepositoryProvider).leaveAcademy();
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Left academy successfully.')),
                   );
                 }
                 ref.invalidate(currentUserProvider); // Refresh UI
               } catch (e) {
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(e.toString())),
                   );
@@ -337,13 +335,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 await file.writeAsString(response.data.toString());
                 
                 await Share.shareXFiles([XFile(file.path)], text: 'My KnoQ Data Export');
-                if (mounted) {
+                if (context.mounted) {
                    ScaffoldMessenger.of(context).showSnackBar(
                      SnackBar(content: Text(l10n?.exportSuccess ?? 'Export successful')),
                    );
                 }
               } catch (e) {
-                if (mounted) {
+                if (context.mounted) {
                    ScaffoldMessenger.of(context).showSnackBar(
                      SnackBar(content: Text('${l10n?.exportError ?? "Failed to export"}: $e')),
                    );

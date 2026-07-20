@@ -21,13 +21,18 @@ export default function Dashboard() {
     activeBats: 0,
   });
   const [chartData, setChartData] = useState<any[]>([]);
+  const [atRiskPlayers, setAtRiskPlayers] = useState<AtRiskPlayer[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await api.get("/dashboard/overview");
-        const { stats: apiStats, chartData: apiChartData } = res.data.data;
+        const [overviewRes, playersRes] = await Promise.all([
+          api.get("/dashboard/overview"),
+          api.get("/dashboard/players")
+        ]);
+
+        const { stats: apiStats, chartData: apiChartData } = overviewRes.data.data;
         
         setStats({
           totalPlayers: apiStats.totalPlayers || 0,
@@ -38,6 +43,26 @@ export default function Dashboard() {
         });
         
         setChartData(apiChartData || []);
+
+        // Filter players who haven't had a session in over 7 days
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        const players = playersRes.data.data || [];
+        const atRisk = players
+          .filter((p: any) => {
+            if (!p.last_session_date) return true; // Never had a session
+            return new Date(p.last_session_date) < sevenDaysAgo;
+          })
+          .map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            lastSessionDate: p.last_session_date || null
+          }))
+          .slice(0, 5); // Take top 5 at risk
+          
+        setAtRiskPlayers(atRisk);
+
       } catch (error) {
         toast.error("Failed to load dashboard data");
         console.error(error);
@@ -49,27 +74,27 @@ export default function Dashboard() {
     fetchDashboard();
   }, []);
 
-  const mockAtRisk: AtRiskPlayer[] = [
-    { id: "1", name: "Rahul Dravid", lastSessionDate: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString() },
-    { id: "2", name: "Sachin T", lastSessionDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString() },
-  ];
-
   if (loading) {
     return <div className="flex items-center justify-center h-[calc(100vh-8rem)]">Loading dashboard...</div>;
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-in-out">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
-          <p className="text-muted-foreground">Welcome back, {dbUser?.name || "Admin"}. Here is your academy's status.</p>
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-in-out">
+      {/* Professional Structural Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 pb-6 border-b">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            Overview
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Welcome back, <span className="font-medium text-foreground">{dbUser?.name || "Admin"}</span>. Here is your academy's status.
+          </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+        <div className="flex gap-2 shrink-0">
+          <Button variant="outline" size="sm" className="h-9">
             <UserPlus className="mr-2 h-4 w-4" /> Invite Player
           </Button>
-          <Button size="sm">
+          <Button size="sm" className="h-9">
             <PlusCircle className="mr-2 h-4 w-4" /> Register Bat
           </Button>
         </div>
@@ -91,7 +116,7 @@ export default function Dashboard() {
             <CardTitle>At-Risk Players</CardTitle>
           </CardHeader>
           <CardContent>
-            <AtRiskPlayers players={mockAtRisk} />
+            <AtRiskPlayers players={atRiskPlayers} />
           </CardContent>
         </Card>
       </div>

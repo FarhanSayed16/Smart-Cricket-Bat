@@ -78,6 +78,39 @@ export default function Login() {
             <Button className="w-full" type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
+            
+            {import.meta.env.VITE_ENABLE_VISITOR_MODE === 'true' && (
+              <>
+                <div className="relative w-full">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">Portfolio</span>
+                  </div>
+                </div>
+                <Button 
+                  type="button" 
+                  variant="secondary" 
+                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white" 
+                  onClick={async () => {
+                    setIsSubmitting(true);
+                    try {
+                      await signInWithEmailAndPassword(auth, "visitor@knoq.in", "visitor123");
+                      toast.success("Logged in as Visitor (Read-only)");
+                      navigate("/dashboard");
+                    } catch (error) {
+                      toast.error("Failed to login as visitor. Did you run the seed script?");
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Loading..." : "Login as Visitor (Demo)"}
+                </Button>
+              </>
+            )}
+
             <div className="relative w-full">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
