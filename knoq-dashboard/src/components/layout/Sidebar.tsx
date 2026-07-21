@@ -76,7 +76,10 @@ export function Sidebar() {
         "fixed inset-y-0 left-0 z-40 w-64 border-r bg-card flex flex-col transition-transform duration-200 ease-in-out md:hidden",
         mobileOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="h-16 flex items-center px-6 border-b">
+        <div className="h-16 flex items-center px-6 border-b gap-3">
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center p-0.5 border border-primary/20 shadow-sm overflow-hidden">
+            <img src="/logo.png" alt="KnoQ Logo" className="w-full h-full object-cover rounded-md" />
+          </div>
           <span className="font-bold text-2xl tracking-tight text-primary">KnoQ</span>
         </div>
         {navContent}
@@ -84,7 +87,10 @@ export function Sidebar() {
 
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-64 border-r bg-card flex-col h-full">
-        <div className="h-16 flex items-center px-6 border-b">
+        <div className="h-16 flex items-center px-6 border-b gap-3">
+          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center p-0.5 border border-primary/20 shadow-sm">
+            <img src="/logo.png" alt="KnoQ Logo" className="w-full h-full object-contain" />
+          </div>
           <span className="font-bold text-2xl tracking-tight text-primary">KnoQ</span>
         </div>
         {navContent}

@@ -10,7 +10,7 @@ class EnvConfig {
       case Environment.staging:
         return 'https://api-staging.knoq.app/v1'; 
       case Environment.dev:
-        return 'https://rdxptxqn-3000.inc1.devtunnels.ms'; // Physical device dev tunnel API targeting
+        return 'https://g6xrghvh-3000.inc1.devtunnels.ms'; // Physical device dev tunnel API targeting
     }
   }
 }

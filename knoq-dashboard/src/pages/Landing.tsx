@@ -18,7 +18,10 @@ export default function Landing() {
     <div className="min-h-screen bg-background flex flex-col font-sans selection:bg-primary/20 selection:text-primary">
       {/* Navbar */}
       <header className="px-6 lg:px-14 py-4 flex items-center justify-between border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center p-1 border border-primary/20 shadow-sm overflow-hidden">
+            <img src="/logo.png" alt="KnoQ Logo" className="w-full h-full object-cover rounded-lg" />
+          </div>
           <span className="text-2xl font-black tracking-tighter text-foreground">KnoQ</span>
         </div>
         <nav className="flex items-center gap-4">
