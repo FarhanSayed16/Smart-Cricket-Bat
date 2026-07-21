@@ -5,7 +5,7 @@ import { Input } from "../components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../components/ui/table"
 import { Badge } from "../components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { Server, Users, Activity, ShieldAlert, Plus, Upload, Search, Wifi, HardDrive, AlertCircle } from "lucide-react"
+import { Server, Users, Activity, Plus, Upload, Search, Wifi, HardDrive, AlertCircle } from "lucide-react"
 import toast from "react-hot-toast"
 
 const ACADEMIES = [

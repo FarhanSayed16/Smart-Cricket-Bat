@@ -21,7 +21,7 @@ export function Navbar() {
             <UserIcon className="h-4 w-4 text-muted-foreground" />
           </div>
           <div className="hidden sm:block text-sm">
-            <p className="font-medium leading-none">{dbUser?.display_name || "Admin"}</p>
+            <p className="font-medium leading-none">{dbUser?.name || "Admin"}</p>
             <p className="text-muted-foreground text-xs mt-0.5 capitalize">{dbUser?.role || "Loading..."}</p>
           </div>
         </div>

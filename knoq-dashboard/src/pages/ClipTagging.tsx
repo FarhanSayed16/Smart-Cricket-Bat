@@ -4,7 +4,7 @@ import { Button } from "../components/ui/button"
 import { Card, CardContent } from "../components/ui/card"
 import { Textarea } from "../components/ui/textarea"
 import { Label } from "../components/ui/label"
-import { ArrowLeft, Play, FastForward, SkipForward, CheckCircle, ActivitySquare } from "lucide-react"
+import { ArrowLeft, Play, FastForward, SkipForward, ActivitySquare } from "lucide-react"
 import toast from "react-hot-toast"
 
 const DELIVERY_TYPES = ["Yorker", "Full", "Good Length", "Short", "Bouncer"]
