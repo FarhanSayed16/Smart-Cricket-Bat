@@ -13,6 +13,7 @@ import 'package:knoq_app/features/ble/domain/ble_state.dart';
 import 'package:go_router/go_router.dart';
 import 'package:camera/camera.dart';
 import 'package:knoq_app/features/session/services/video_sync_service.dart';
+import 'package:knoq_app/features/auth/providers/auth_provider.dart';
 
 class LiveSessionScreen extends ConsumerStatefulWidget {
   const LiveSessionScreen({super.key});
@@ -112,6 +113,8 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
     final theme = Theme.of(context);
     final bleState = ref.watch(bleProvider);
     final sessionState = ref.watch(liveSessionProvider);
+    final userAsync = ref.watch(currentUserProvider);
+    final user = userAsync.valueOrNull;
 
     // Provide haptic feedback trigger on each new shot
     ref.listen(liveSessionProvider, (previous, next) {
@@ -268,10 +271,22 @@ class _LiveSessionScreenState extends ConsumerState<LiveSessionScreen> {
                type: KnoqButtonType.danger,
                onPressed: _confirmEndSession,
             ),
-          ),
-        ),
-      ),
-    );
+           ),
+         ),
+        floatingActionButton: user?.email == 'player1_demo@knoq.in'
+            ? Padding(
+                padding: const EdgeInsets.only(bottom: 80.0),
+                child: FloatingActionButton.extended(
+                  onPressed: () {
+                    ref.read(bleProvider.notifier).simulateHit();
+                  },
+                  icon: const Icon(Icons.touch_app),
+                  label: const Text('Simulate Hit'),
+                ),
+              )
+            : null,
+       ),
+     );
   }
 
   Widget _buildConnectionDot(BleState bleState) {

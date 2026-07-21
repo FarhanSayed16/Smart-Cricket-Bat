@@ -210,4 +210,50 @@ router.put('/:sessionId/shots/:shotNumber/offset', verifyToken, async (req, res)
     }
 });
 
+// Get a specific session by ID with its shots
+router.get('/:id', verifyToken, async (req, res) => {
+    try {
+        const sessionId = req.params.id;
+        
+        const sessionQuery = `SELECT * FROM sessions WHERE id = $1`;
+        const sessionResult = await db.query(sessionQuery, [sessionId]);
+        
+        if (sessionResult.rows.length === 0) {
+            return res.status(404).json({ status: 'error', message: 'Session not found' });
+        }
+
+        const shotsQuery = `SELECT * FROM shots WHERE session_id = $1 ORDER BY shot_number ASC`;
+        const shotsResult = await db.query(shotsQuery, [sessionId]);
+
+        res.status(200).json({ 
+            status: 'success', 
+            data: {
+                session: sessionResult.rows[0],
+                shots: shotsResult.rows
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching session by ID:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to fetch session' });
+    }
+});
+
+// Delete a session by ID
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        const sessionId = req.params.id;
+        
+        const result = await db.query('DELETE FROM sessions WHERE id = $1 AND player_id = (SELECT id FROM users WHERE firebase_uid = $2)', [sessionId, req.user.uid]);
+        
+        if (result.rowCount === 0) {
+            return res.status(404).json({ status: 'error', message: 'Session not found or unauthorized' });
+        }
+
+        res.status(200).json({ status: 'success', message: 'Session deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting session:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to delete session' });
+    }
+});
+
 module.exports = router;

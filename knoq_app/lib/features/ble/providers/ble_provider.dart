@@ -185,6 +185,30 @@ class BleNotifier extends StateNotifier<BleState> {
      await _repo.sendCommand('{"cmd": "reset_session"}');
   }
 
+  int _simulatedHits = 0;
+
+  void simulateHit() {
+    _simulatedHits++;
+    final now = DateTime.now();
+    // Generate random values for a believable fake shot
+    final fakeSpeed = 70.0 + (DateTime.now().millisecond % 40); // 70 to 110
+    final fakePower = 50 + (DateTime.now().millisecond % 50);
+    final isSweetSpot = DateTime.now().millisecond % 3 != 0; // 66% chance of sweet spot
+    
+    final fakeShot = ShotData(
+      hit: _simulatedHits,
+      zone: isSweetSpot ? 'Sweet' : 'Bottom',
+      power: fakePower,
+      swing: fakeSpeed,
+      sweetPct: 80,
+      avgPower: 70,
+      totalHits: _simulatedHits,
+      timestamp: now,
+    );
+    
+    _shotStreamController.add(fakeShot);
+  }
+
   @override
   void dispose() {
     _connectionSub?.cancel();

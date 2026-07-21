@@ -104,11 +104,28 @@ async function seedVisitor() {
         ];
 
         for (const dp of dummyPlayers) {
-            let pUid = 'demo_uid_' + Math.random().toString(36).substring(7);
+            let pUid;
+            try {
+                const userRecord = await admin.auth().createUser({
+                    email: dp.email,
+                    password: 'demo123',
+                    displayName: dp.name,
+                });
+                pUid = userRecord.uid;
+            } catch (error) {
+                if (error.code === 'auth/email-already-exists') {
+                    const userRecord = await admin.auth().getUserByEmail(dp.email);
+                    pUid = userRecord.uid;
+                    await admin.auth().updateUser(pUid, { password: 'demo123' });
+                } else {
+                    throw error;
+                }
+            }
+            
             const pq = `
                 INSERT INTO users (firebase_uid, email, name, role, onboarding_complete)
                 VALUES ($1, $2, $3, $4, true)
-                ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name
+                ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, firebase_uid = EXCLUDED.firebase_uid
                 RETURNING id;
             `;
             const pr = await db.query(pq, [pUid, dp.email, dp.name, dp.role]);
@@ -129,11 +146,28 @@ async function seedVisitor() {
         ];
 
         for (const dc of dummyCoaches) {
-            let cUid = 'demo_coach_' + Math.random().toString(36).substring(7);
+            let cUid;
+            try {
+                const userRecord = await admin.auth().createUser({
+                    email: dc.email,
+                    password: 'demo123',
+                    displayName: dc.name,
+                });
+                cUid = userRecord.uid;
+            } catch (error) {
+                if (error.code === 'auth/email-already-exists') {
+                    const userRecord = await admin.auth().getUserByEmail(dc.email);
+                    cUid = userRecord.uid;
+                    await admin.auth().updateUser(cUid, { password: 'demo123' });
+                } else {
+                    throw error;
+                }
+            }
+
             const cq = `
                 INSERT INTO users (firebase_uid, email, name, role, onboarding_complete)
                 VALUES ($1, $2, $3, $4, true)
-                ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name
+                ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, firebase_uid = EXCLUDED.firebase_uid
                 RETURNING id;
             `;
             const cr = await db.query(cq, [cUid, dc.email, dc.name, dc.role]);

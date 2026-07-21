@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:go_router/go_router.dart';
 import 'package:knoq_app/core/widgets/knoq_button.dart';
 import 'package:knoq_app/features/ble/providers/ble_provider.dart';
 import 'package:knoq_app/features/ble/domain/ble_state.dart';
@@ -45,7 +46,9 @@ class _BleScanScreenState extends ConsumerState<BleScanScreen> with SingleTicker
         title: const Text('Connect Bat'),
         leading: BackButton(onPressed: () async {
             await ref.read(bleProvider.notifier).stopScan();
-            if (context.mounted) Navigator.pop(context);
+            if (context.mounted) {
+              context.go('/');
+            }
         }),
       ),
       body: SafeArea(

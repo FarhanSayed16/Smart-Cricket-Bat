@@ -6,6 +6,8 @@ import 'package:knoq_app/features/ble/domain/shot_data.dart';
 import 'package:knoq_app/core/widgets/zone_badge.dart';
 import 'package:knoq_app/features/session/providers/session_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:knoq_app/core/widgets/bat_zone_diagram.dart';
+import 'package:knoq_app/core/widgets/empty_state.dart';
 
 
 final sessionHistoryProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, String>((ref, sessionId) async {
@@ -53,15 +55,49 @@ class _ShotHistoryScreenState extends ConsumerState<ShotHistoryScreen> {
             children: [
                _buildSessionHeader(context, theme, session),
                _buildCoachNotes(context, theme),
+               
+               Padding(
+                 padding: const EdgeInsets.symmetric(vertical: 24.0),
+                 child: Row(
+                   mainAxisAlignment: MainAxisAlignment.center,
+                   children: [
+                     SizedBox(
+                       height: 120,
+                       width: 80,
+                       child: BatZoneDiagram(
+                         zoneDistribution: session.zoneDistribution.isNotEmpty 
+                           ? session.zoneDistribution.map((k, v) => MapEntry(k, (v as num).toDouble()))
+                           : {'Sweet': session.sweetSpotPct / 100.0, 'Top': (100 - session.sweetSpotPct) / 200.0, 'Bottom': (100 - session.sweetSpotPct) / 200.0}
+                       ),
+                     ),
+                     const SizedBox(width: 32),
+                     Column(
+                       crossAxisAlignment: CrossAxisAlignment.start,
+                       children: [
+                         Text('Impact Heatmap', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                         const SizedBox(height: 8),
+                         Text('Based on ${session.totalHits} hits', style: theme.textTheme.bodySmall),
+                       ]
+                     )
+                   ]
+                 )
+               ),
+
                _buildFilterBar(theme),
                Expanded(
-                 child: ListView.builder(
-                   padding: const EdgeInsets.only(top: 8, bottom: 24),
-                   itemCount: filteredShots.length,
-                   itemBuilder: (context, index) {
-                     return _buildShotRow(context, theme, filteredShots[index]);
-                   },
-                 ),
+                 child: filteredShots.isEmpty 
+                   ? const EmptyState(
+                       illustration: Icon(Icons.sports_cricket, size: 64, color: Colors.grey),
+                       title: 'No Shot Logs',
+                       subtitle: 'Individual shot logs were not recorded or synced for this session.',
+                     )
+                   : ListView.builder(
+                       padding: const EdgeInsets.only(top: 8, bottom: 24),
+                       itemCount: filteredShots.length,
+                       itemBuilder: (context, index) {
+                         return _buildShotRow(context, theme, filteredShots[index]);
+                       },
+                     ),
                )
             ],
           );

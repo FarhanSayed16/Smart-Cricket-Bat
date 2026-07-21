@@ -119,6 +119,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     );
                   },
                 ),
+                const SizedBox(height: 16),
+                KnoqButton(
+                  text: 'Try Demo Mode',
+                  type: KnoqButtonType.secondary,
+                  onPressed: () {
+                    _emailCtrl.text = 'player1_demo@knoq.in';
+                    _passwordCtrl.text = 'demo123';
+                    _handleLogin();
+                  },
+                ),
                 const SizedBox(height: 32),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
