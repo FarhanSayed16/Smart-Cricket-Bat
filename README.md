@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="ChatGPT Image Jul 21, 2026, 05_41_40 AM.png" alt="KnoQ Logo" width="180" />
+  <img src="images/logo.png" alt="KnoQ Logo" width="180" />
 </p>
 
 <h1 align="center">KnoQ — Smart Cricket Bat</h1>
@@ -60,22 +60,22 @@ The system captures **real-time batting metrics** — swing speed, impact zone, 
 ### 🖥️ Web Dashboard (React + Vite)
 
 <p align="center">
-  <img src="images/dahboard/Screenshot 2026-07-21 050330.png" alt="Dashboard Overview" width="800" />
+  <img src="images/dashboard/dashboard1.png" alt="Dashboard Overview" width="800" />
 </p>
 <p align="center"><em>Academy Overview — Players, Coaches, Sessions, Active Bats at a glance</em></p>
 
 <p align="center">
-  <img src="images/dahboard/Screenshot 2026-07-21 050313.png" alt="Analytics" width="800" />
+  <img src="images/dashboard/dashboard2.png" alt="Analytics" width="800" />
 </p>
 <p align="center"><em>Analytics — Sessions per Day, Sweet Spot & Power Trends over 30 days</em></p>
 
 <p align="center">
-  <img src="images/dahboard/Screenshot 2026-07-21 050359.png" alt="Leaderboards" width="800" />
+  <img src="images/dashboard/Screenshot 2026-07-21 050359.png" alt="Leaderboards" width="800" />
 </p>
 <p align="center"><em>Zone Distribution Donut Chart & Player Leaderboards</em></p>
 
 <p align="center">
-  <img src="images/dahboard/Screenshot 2026-07-21 050338.png" alt="Devices" width="800" />
+  <img src="images/dashboard/Screenshot 2026-07-21 050338.png" alt="Devices" width="800" />
 </p>
 <p align="center"><em>Device Management — Battery, Firmware, Online Status</em></p>
 
@@ -321,7 +321,7 @@ Unauthorized copying, modification, distribution, or use of this project — in 
 ---
 
 <p align="center">
-  <img src="ChatGPT Image Jul 21, 2026, 05_41_40 AM.png" alt="KnoQ" width="60" />
+  <img src="images/logo.png" alt="KnoQ" width="60" />
   <br />
   <strong>Built with 🏏 for cricket lovers.</strong>
   <br />

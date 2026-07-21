@@ -1,12 +1,12 @@
 enum Environment { dev, staging, prod }
 
 class EnvConfig {
-  static Environment currentEnvironment = Environment.dev;
+  static Environment currentEnvironment = Environment.prod;
 
   static String get apiBaseUrl {
     switch (currentEnvironment) {
       case Environment.prod:
-        return 'https://api.knoq.app/v1'; // TODO: Update with real prod API
+        return 'https://knoq-api.onrender.com';
       case Environment.staging:
         return 'https://api-staging.knoq.app/v1'; 
       case Environment.dev:

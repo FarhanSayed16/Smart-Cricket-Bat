@@ -89,3 +89,41 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+@layer utilities {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-float-delayed {
+    animation: float 6s ease-in-out 3s infinite;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .rotate-y-12 {
+    transform: rotateY(12deg) rotateX(5deg);
+  }
+
+  .rotate-y-neg-12 {
+    transform: rotateY(-12deg) rotateX(5deg);
+  }
+
+  .glass-panel {
+    @apply bg-background/60 backdrop-blur-xl border border-white/20 shadow-2xl;
+  }
+}
